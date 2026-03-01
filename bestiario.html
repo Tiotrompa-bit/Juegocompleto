@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bestiario — D&D 5e</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+:root{
+  --bg:#0d0d0d; --surface:#141414; --card:#1a1a1a; --card2:#1f1f1f;
+  --border:#2a2a2a; --border2:#333;
+  --red:#c62828; --red2:#e53935; --gold:#c8a84b; --gold2:#e8c87a;
+  --text:#e8e0d0; --muted:#888; --dim:#555;
+  --green:#4caf50; --blue:#42a5f5; --purple:#ab47bc; --orange:#ff7043;
+  --radius:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Text',Georgia,serif;min-height:100vh;}
+
+/* NAV */
+.topbar{display:flex;align-items:center;gap:16px;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.topbar-logo{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold);text-decoration:none;white-space:nowrap;}
+.topbar-nav{display:flex;gap:4px;margin-left:auto;}
+.topbar-nav a{color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:var(--radius);font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.5px;transition:all 0.2s;}
+.topbar-nav a:hover{color:var(--gold);background:rgba(200,168,75,0.08);}
+.topbar-nav a.active{color:var(--gold);background:rgba(200,168,75,0.12);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 49px);}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px;position:sticky;top:49px;height:calc(100vh - 49px);overflow-y:auto;}
+.main{padding:24px;overflow-y:auto;}
+
+/* SIDEBAR */
+.sidebar h3{font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;margin-top:20px;}
+.sidebar h3:first-child{margin-top:0;}
+.search-wrap{position:relative;margin-bottom:4px;}
+.search-wrap input{width:100%;padding:9px 12px 9px 34px;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:0.95rem;}
+.search-wrap::before{content:'⚔';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;}
+.search-wrap input:focus{outline:none;border-color:var(--gold);background:var(--card2);}
+
+.filter-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px;}
+.chip{padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--card);color:var(--muted);font-size:0.78rem;cursor:pointer;transition:all 0.2s;font-family:'Cinzel',serif;letter-spacing:0.3px;}
+.chip:hover{border-color:var(--gold);color:var(--gold);}
+.chip.on{background:var(--gold);border-color:var(--gold);color:#000;font-weight:600;}
+
+.range-row{display:flex;gap:8px;align-items:center;}
+.range-row input{flex:1;padding:7px 10px;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:0.88rem;width:100%;}
+.range-row input:focus{outline:none;border-color:var(--gold);}
+.range-row span{color:var(--muted);font-size:0.85rem;}
+
+.prop-list{display:flex;flex-direction:column;gap:4px;}
+.prop-check{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem;color:var(--muted);padding:3px 0;}
+.prop-check input{accent-color:var(--gold);width:14px;height:14px;}
+.prop-check:hover{color:var(--text);}
+
+.btn-reset{width:100%;padding:8px;margin-top:16px;background:transparent;border:1px solid var(--border2);border-radius:var(--radius);color:var(--muted);cursor:pointer;font-family:'Cinzel',serif;font-size:0.75rem;letter-spacing:1px;transition:all 0.2s;}
+.btn-reset:hover{border-color:var(--red);color:var(--red);}
+
+/* MAIN AREA */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.results-count{color:var(--muted);font-size:0.88rem;margin-right:auto;}
+.results-count strong{color:var(--gold);}
+.sort-select{padding:8px 12px;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:0.88rem;cursor:pointer;}
+.sort-select:focus{outline:none;border-color:var(--gold);}
+
+/* GRID VIEW */
+#creaturesGrid.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+#creaturesGrid.list-view{display:flex;flex-direction:column;gap:6px;}
+
+/* CREATURE CARD */
+.creature-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.creature-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--type-color,var(--dim));opacity:0.7;transition:opacity 0.2s;}
+.creature-card:hover{border-color:var(--border2);background:var(--card2);transform:translateY(-1px);}
+.creature-card:hover::before{opacity:1;}
+.creature-card.selected{border-color:var(--gold);background:var(--card2);}
+.creature-card.selected::before{opacity:1;}
+
+/* Grid layout */
+.grid-view .creature-card{padding:16px;}
+.grid-view .creature-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.grid-view .creature-icon{font-size:2.2rem;}
+.grid-view .creature-title{flex:1;}
+.grid-view .creature-name{font-family:'Cinzel',serif;font-size:1rem;color:var(--text);margin-bottom:2px;}
+.grid-view .creature-meta{font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+.grid-view .creature-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.grid-view .stat-box{background:rgba(200,168,75,0.1);border:1px solid var(--gold);border-radius:4px;padding:6px;text-align:center;}
+.grid-view .stat-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;}
+.grid-view .stat-value{font-size:1rem;color:var(--gold);font-weight:600;}
+.grid-view .creature-traits{font-size:0.85rem;color:var(--muted);margin-bottom:8px;line-height:1.4;}
+.grid-view .creature-tags{display:flex;flex-wrap:wrap;gap:4px;}
+
+/* List layout */
+.list-view .creature-card{padding:12px 16px;display:grid;grid-template-columns:2.5rem 1fr auto auto auto;align-items:center;gap:12px;}
+.list-view .creature-icon{font-size:1.8rem;}
+.list-view .creature-name{font-family:'Cinzel',serif;font-size:0.9rem;}
+.list-view .creature-meta{font-size:0.7rem;color:var(--muted);}
+.list-view .creature-stats{display:flex;gap:6px;}
+.list-view .stat-box{font-size:0.7rem;padding:2px 6px;}
+.list-view .creature-traits{display:none;}
+
+/* Tags */
+.tag{padding:2px 8px;border-radius:10px;font-size:0.7rem;background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);}
+.tag-size-tiny{background:rgba(66,165,245,0.1);color:var(--blue);border-color:var(--blue);}
+.tag-size-small{background:rgba(76,175,80,0.1);color:var(--green);border-color:var(--green);}
+.tag-size-medium{background:rgba(200,168,75,0.1);color:var(--gold);border-color:var(--gold);}
+.tag-size-large{background:rgba(255,112,67,0.1);color:var(--orange);border-color:var(--orange);}
+.tag-size-huge{background:rgba(198,40,40,0.1);color:var(--red);border-color:var(--red);}
+.tag-size-gargantuan{background:rgba(171,71,188,0.1);color:var(--purple);border-color:var(--purple);}
+.tag-type-aberration{color:#9c27b0;}
+.tag-type-beast{color:#8bc34a;}
+.tag-type-celestial{color:#ffeb3b;}
+.tag-type-construct{color:#9e9e9e;}
+.tag-type-dragon{color:#f44336;}
+.tag-type-elemental{color:#00bcd4;}
+.tag-type-fey{color:#e91e63;}
+.tag-type-fiend{color:#673ab7;}
+.tag-type-giant{color:#795548;}
+.tag-type-humanoid{color:#ff9800;}
+.tag-type-monstrosity{color:#607d8b;}
+.tag-type-ooze{color:#8bc34a;}
+.tag-type-plant{color:#4caf50;}
+.tag-type-undead{color:#9e9e9e;}
+
+/* DETAIL PANEL */
+.detail-panel{position:fixed;right:0;top:49px;bottom:0;width:420px;background:var(--surface);border-left:1px solid var(--border);padding:24px;overflow-y:auto;transform:translateX(100%);transition:transform 0.3s ease;z-index:90;}
+.detail-panel.open{transform:translateX(0);}
+.detail-close{position:absolute;top:16px;right:16px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:1.3rem;padding:4px 8px;}
+.detail-close:hover{color:var(--text);}
+.detail-icon{font-size:3.5rem;display:block;margin-bottom:12px;}
+.detail-name{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--gold);margin-bottom:4px;line-height:1.3;}
+.detail-meta{font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;font-family:'Cinzel',serif;}
+.detail-section{margin-bottom:20px;}
+.detail-section h4{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+.detail-desc{font-size:0.95rem;line-height:1.7;color:var(--text);margin-bottom:12px;}
+
+/* Stats block */
+.stats-block{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-box-detail{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:10px;text-align:center;}
+.stat-box-detail .stat-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-family:'Cinzel',serif;}
+.stat-box-detail .stat-value{font-size:1.1rem;color:var(--gold);font-weight:600;}
+.stat-box-detail .stat-sub{font-size:0.75rem;color:var(--dim);}
+
+/* Ability scores */
+.ability-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.ability-item{background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);padding:8px;display:flex;justify-content:space-between;align-items:center;}
+.ability-name{font-size:0.8rem;color:var(--text);font-family:'Cinzel',serif;}
+.ability-score{font-size:1rem;color:var(--gold);font-weight:600;}
+.ability-mod{color:var(--muted);font-size:0.8rem;}
+
+/* Traits */
+.trait-item{background:var(--card);border-left:3px solid var(--gold);border-radius:0 var(--radius) var(--radius) 0;padding:12px;margin-bottom:10px;}
+.trait-name{font-family:'Cinzel',serif;font-size:0.85rem;color:var(--gold);margin-bottom:6px;}
+.trait-desc{font-size:0.88rem;color:var(--muted);line-height:1.5;}
+
+/* Actions */
+.action-item{background:var(--card2);border:1px solid var(--border2);border-radius:var(--radius);padding:12px;margin-bottom:8px;}
+.action-name{font-family:'Cinzel',serif;font-size:0.9rem;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.action-type{font-size:0.7rem;color:var(--muted);text-transform:uppercase;}
+.action-desc{font-size:0.85rem;color:var(--muted);line-height:1.5;}
+.action-attack{color:var(--red);}
+.action-damage{color:var(--orange);}
+
+/* Legendary actions */
+.legendary-section{background:linear-gradient(135deg,rgba(198,40,40,0.1) 0%,rgba(198,40,40,0.05) 100%);border:1px solid var(--red);border-radius:var(--radius);padding:14px;margin-bottom:12px;}
+.legendary-title{font-family:'Cinzel',serif;font-size:0.9rem;color:var(--red);margin-bottom:8px;}
+
+/* Tags */
+.detail-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;}
+.detail-tag{padding:4px 12px;border-radius:12px;font-size:0.75rem;border:1px solid;font-family:'Cinzel',serif;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:80px 20px;color:var(--dim);}
+.empty span{font-size:3rem;display:block;margin-bottom:12px;}
+.empty p{font-size:1rem;color:var(--muted);}
+
+/* PAGE */
+.pagination{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:24px;}
+.page-btn{padding:7px 13px;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius);color:var(--muted);cursor:pointer;font-family:'Cinzel',serif;font-size:0.8rem;transition:all 0.2s;}
+.page-btn:hover:not(:disabled):not(.active){border-color:var(--gold);color:var(--gold);}
+.page-btn.active{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700;}
+.page-btn:disabled{opacity:0.3;cursor:default;}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);}
+  .detail-panel{width:100%;top:0;}
+  .stats-block{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a class="topbar-logo" href="index.html">⚔ D&D 5e</a>
+  <div class="topbar-nav">
+    <a href="ficha.html">Ficha</a>
+    <a href="creador.html">Creador</a>
+    <a href="tienda.html">Tienda</a>
+    <a href="bestiario.html" class="active">Bestiario</a>
+    <a href="razas.html">Razas</a>
+    <a href="dotes.html">Dotes</a>
+    <a href="rasgos.html">Rasgos</a>
+    <a href="dm.html">DM</a>
+  </div>
+</nav>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h3>Buscar</h3>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Nombre de la criatura..." oninput="filterAndRender()">
+    </div>
+
+    <h3>Tipo</h3>
+    <div class="filter-chips" id="typeChips">
+      <div class="chip on" data-type="all">Todos</div>
+      <div class="chip" data-type="aberration">Aberración</div>
+      <div class="chip" data-type="beast">Bestia</div>
+      <div class="chip" data-type="celestial">Celestial</div>
+      <div class="chip" data-type="construct">Constructo</div>
+      <div class="chip" data-type="dragon">Dragón</div>
+      <div class="chip" data-type="elemental">Elemental</div>
+      <div class="chip" data-type="fey">Fey</div>
+      <div class="chip" data-type="fiend">Infernal</div>
+      <div class="chip" data-type="giant">Gigante</div>
+      <div class="chip" data-type="humanoid">Humanoide</div>
+      <div class="chip" data-type="monstrosity">Monstruosidad</div>
+      <div class="chip" data-type="ooze">Limo</div>
+      <div class="chip" data-type="plant">Planta</div>
+      <div class="chip" data-type="undead">No muerto</div>
+    </div>
+
+    <h3>Tamaño</h3>
+    <div class="filter-chips" id="sizeChips">
+      <div class="chip on" data-size="all">Todos</div>
+      <div class="chip" data-size="Diminuto">Diminuto</div>
+      <div class="chip" data-size="Pequeño">Pequeño</div>
+      <div class="chip" data-size="Mediano">Mediano</div>
+      <div class="chip" data-size="Grande">Grande</div>
+      <div class="chip" data-size="Enorme">Enorme</div>
+      <div class="chip" data-size="Gargantúa">Gargantúa</div>
+    </div>
+
+    <h3>Desafío (XP)</h3>
+    <div class="range-row">
+      <input type="number" id="crMin" placeholder="Min" min="0" step="0.125" oninput="filterAndRender()">
+      <span>—</span>
+      <input type="number" id="crMax" placeholder="Max" min="0" step="0.125" oninput="filterAndRender()">
+    </div>
+
+    <h3>Estadísticas</h3>
+    <div class="prop-list" id="abilityFilters">
+      <label class="prop-check"><input type="checkbox" data-ability="legendary" onchange="filterAndRender()"> Acciones Legendarias</label>
+      <label class="prop-check"><input type="checkbox" data-ability="spellcasting" onchange="filterAndRender()"> Lanzamiento de Hechizos</label>
+      <label class="prop-check"><input type="checkbox" data-ability="fly" onchange="filterAndRender()"> Vuelo</label>
+      <label class="prop-check"><input type="checkbox" data-ability="swim" onchange="filterAndRender()"> Natación</label>
+      <label class="prop-check"><input type="checkbox" data-ability="darkvision" onchange="filterAndRender()"> Visión en la Oscuridad</label>
+    </div>
+
+    <h3>Ambiente</h3>
+    <div class="filter-chips" id="envChips">
+      <div class="chip on" data-env="all">Todos</div>
+      <div class="chip" data-env="arctic">Ártico</div>
+      <div class="chip" data-env="coastal">Costero</div>
+      <div class="chip" data-env="desert">Desierto</div>
+      <div class="chip" data-env="forest">Bosque</div>
+      <div class="chip" data-env="grassland">Pradera</div>
+      <div class="chip" data-env="hill">Colina</div>
+      <div class="chip" data-env="mountain">Montaña</div>
+      <div class="chip" data-env="swamp">Pantano</div>
+      <div class="chip" data-env="underdark">Underdark</div>
+      <div class="chip" data-env="underwater">Submarino</div>
+      <div class="chip" data-env="urban">Urbano</div>
+    </div>
+
+    <button class="btn-reset" onclick="resetFilters()">✕ Limpiar Filtros</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="toolbar">
+      <div class="results-count"><strong id="countNum">0</strong> criaturas encontradas</div>
+      <select class="sort-select" id="sortSel" onchange="filterAndRender()">
+        <option value="nombre">Nombre A→Z</option>
+        <option value="nombre_desc">Nombre Z→A</option>
+        <option value="cr_asc">Desafío: Menor primero</option>
+        <option value="cr_desc">Desafío: Mayor primero</option>
+        <option value="hp_asc">PG: Menor primero</option>
+        <option value="hp_desc">PG: Mayor primero</option>
+      </select>
+    </div>
+
+    <div id="creaturesGrid" class="grid-view"></div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel" id="detailPanel">
+  <button class="detail-close" onclick="closeDetail()">✕</button>
+  <div id="detailContent"></div>
+</div>
+
+<script>
+/* =====================================================
+   BIBLIOTECA DE CRIATURAS D&D 5e
+   ===================================================== */
+const CREATURES = [
+  // ════════════════════════════════════════════
+  // ABERRACIONES
+  // ════════════════════════════════════════════
+  {
+    id: 'beholder',
+    nombre: 'Observador',
+    icono: '👁️',
+    type: 'aberration',
+    size: 'Grande',
+    alignment: 'Legal Maligno',
+    ac: 18,
+    hp: 180,
+    speed: '0 pies (vuelo 20 pies)',
+    cr: '13',
+    xp: 10000,
+    stats: { str: 10, dex: 14, con: 18, int: 17, wis: 15, cha: 17 },
+    saves: { int: 8, wis: 7, cha: 8 },
+    skills: { perception: 12 },
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 22',
+    languages: 'Profundo, Infralingual',
+    traits: [
+      { name: 'Antimagia', desc: 'El ojo central emite un cono de antimagia de 150 pies. En esa área, los hechizos no pueden lanzarse, los efectos mágicos son suprimidos, y las criaturas mágicas tienen desventaja en ataques.' },
+      { name: 'Inmunidad a la Parálisis', desc: 'El observador es inmune a la condición paralizado.' },
+      { name: 'Telequinesis', desc: 'El observador puede mover objetos y criaturas con su mente.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+5', damage: '4d6 perforante', desc: 'Ataque cuerpo a cuerpo.' },
+      { name: 'Rayos Oculares', type: 'Especial', desc: 'El observador dispara 3 rayos mágicos aleatorios de sus ojos (1. Encantar, 2. Dormir, 3. Telequinesis, 4. Petrificar, 5. Desintegrar, 6. Miedo, 7. Enfermar, 8. Matar). CD 16 salvación.' },
+      { name: 'Rayo de Antimagia', type: 'Especial', desc: 'El ojo central cancela toda magia en un cono de 150 pies.' }
+    ],
+    legendary: {
+      actions: 3,
+      desc: 'El observador puede realizar 3 acciones legendarias, eligiendo entre las opciones siguientes. Solo puede usar una opción a la vez y solo al final del turno de otra criatura.',
+      options: [
+        { name: 'Rayo Ocular', desc: 'El observador usa un rayo ocular.' },
+        { name: 'Mover', desc: 'El observador se mueve hasta la mitad de su velocidad sin provocar ataques de oportunidad.' }
+      ]
+    },
+    environments: ['underdark'],
+    source: 'mm'
+  },
+  {
+    id: 'mind_flayer',
+    nombre: 'Devorador de Mentes',
+    icono: '🦑',
+    type: 'aberration',
+    size: 'Mediano',
+    alignment: 'Legal Maligno',
+    ac: 15,
+    hp: 71,
+    speed: '30 pies',
+    cr: '7',
+    xp: 2900,
+    stats: { str: 11, dex: 12, con: 12, int: 19, wis: 17, cha: 17 },
+    saves: { int: 7, wis: 6, cha: 6 },
+    skills: { arcana: 7, deception: 6, insight: 6, perception: 6, persuasion: 6, stealth: 4 },
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 16',
+    languages: 'Infralingual, telepatía 120 pies',
+    traits: [
+      { name: 'Resistencia Mágica', desc: 'El devorador de mentes tiene ventaja en tiradas de salvación contra hechizos y otros efectos mágicos.' },
+      { name: 'Telepatía', desc: 'El devorador de mentes puede comunicarse telepáticamente con cualquier criatura que entienda un idioma dentro de 120 pies.' }
+    ],
+    actions: [
+      { name: 'Tentáculos', type: 'Ataque', attack: '+7', damage: '2d10+4 psíquico', desc: 'Si el objetivo es Mediano o menor, queda agarrado (CD 15 FUE para escapar). Si agarrado, el devorador puede usar Acción de Cerebro.' },
+      { name: 'Acción de Cerebro', type: 'Especial', desc: 'Si tiene agarrada una criatura, extrae y devora su cerebro, matándola instantáneamente (CD 15 INT para evitar).' },
+      { name: 'Explosión Mental', type: 'Especial', desc: '60 pies cónico. CD 15 INT o 4d8+4 psíquico y aturdido 1 minuto.' }
+    ],
+    spellcasting: {
+      ability: 'int',
+      dc: 15,
+      attack: 7,
+      spells: ['Detectar Pensamientos', 'Dominar Monstruo', 'Levitación', 'Miedo', 'Telaraña']
+    },
+    environments: ['underdark'],
+    source: 'mm'
+  },
+  {
+    id: 'aboleth',
+    nombre: 'Aboleth',
+    icono: '🐟',
+    type: 'aberration',
+    size: 'Grande',
+    alignment: 'Legal Maligno',
+    ac: 17,
+    hp: 135,
+    speed: '10 pies, nadar 40 pies',
+    cr: '10',
+    xp: 5900,
+    stats: { str: 21, dex: 9, con: 15, int: 18, wis: 15, cha: 18 },
+    saves: { con: 6, int: 8, wis: 6 },
+    skills: { history: 12, perception: 10 },
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 20',
+    languages: 'Profundo, telepatía 120 pies',
+    traits: [
+      { name: 'Respiración Anfibia', desc: 'El aboleth puede respirar aire y agua.' },
+      { name: 'Mucosa Protéica', desc: 'Cualquier criatura que toque al aboleth o golpee cuerpo a cuerpo debe superar CD 14 CON o no puede respirar aire durante 4 horas.' },
+      { name: 'Telepatía', desc: 'Comunicación telepática 120 pies.' }
+    ],
+    actions: [
+      { name: 'Tentáculos', type: 'Ataque', attack: '+9', damage: '3d6+5 contundente', desc: 'Si impacta, CD 14 CON o convertido en aboleth esclavo.' },
+      { name: 'Cola', type: 'Ataque', attack: '+9', damage: '3d6+5 contundente', desc: 'Alcance 10 pies.' },
+      { name: 'Enslave', type: 'Especial', desc: 'CD 14 WIS o encantado. El aboleth puede telepáticamente controlar al esclavo a cualquier distancia.' }
+    ],
+    legendary: {
+      actions: 3,
+      desc: 'El aboleth puede realizar 3 acciones legendarias.',
+      options: [
+        { name: 'Detectar', desc: 'Hace una prueba de Sabiduría (Percepción).' },
+        { name: 'Golpe de Cola', desc: 'Realiza un ataque de cola.' },
+        { name: 'Controlar Esclavo', desc: 'El aboleth controla mentalmente a un esclavo.' }
+      ]
+    },
+    environments: ['underwater', 'underdark'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // BESTIAS
+  // ════════════════════════════════════════════
+  {
+    id: 'brown_bear',
+    nombre: 'Oso Pardo',
+    icono: '🐻',
+    type: 'beast',
+    size: 'Grande',
+    alignment: 'No alineado',
+    ac: 11,
+    hp: 34,
+    speed: '40 pies, escalar 30 pies',
+    cr: '1',
+    xp: 200,
+    stats: { str: 19, dex: 10, con: 16, int: 2, wis: 13, cha: 7 },
+    skills: { perception: 3 },
+    senses: 'Olfato agudo, Percepción pasiva 13',
+    languages: '—',
+    traits: [
+      { name: 'Olfato Agudo', desc: 'El oso tiene ventaja en pruebas de Sabiduría (Percepción) que dependan del olfato.' },
+      { name: 'Furia', desc: 'Cuando el oso tiene 10 PG o menos, tiene ventaja en tiradas de ataque.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+5', damage: '1d8+4 perforante', desc: 'Ataque cuerpo a cuerpo.' },
+      { name: 'Garras', type: 'Ataque', attack: '+5', damage: '2d6+4 cortante', desc: 'Ataque cuerpo a cuerpo.' }
+    ],
+    environments: ['forest', 'hill', 'mountain'],
+    source: 'mm'
+  },
+  {
+    id: 'dire_wolf',
+    nombre: 'Lobo Atroz',
+    icono: '🐺',
+    type: 'beast',
+    size: 'Grande',
+    alignment: 'No alineado',
+    ac: 14,
+    hp: 37,
+    speed: '50 pies',
+    cr: '1',
+    xp: 200,
+    stats: { str: 17, dex: 15, con: 15, int: 3, wis: 12, cha: 7 },
+    skills: { perception: 3, stealth: 4 },
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 13',
+    languages: '—',
+    traits: [
+      { name: 'Ventaja en Manada', desc: 'Si un aliado está a 5 pies del objetivo, el lobo tiene ventaja en tiradas de ataque.' },
+      { name: 'Oído y Olfato Agudos', desc: 'El lobo tiene ventaja en pruebas de Sabiduría (Percepción) que dependan del oído u olfato.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+5', damage: '2d6+3 perforante', desc: 'Si el objetivo es una criatura, debe superar CD 13 FUE o caer derribado.' }
+    ],
+    environments: ['forest', 'hill', 'grassland'],
+    source: 'mm'
+  },
+  {
+    id: 'giant_spider',
+    nombre: 'Araña Gigante',
+    icono: '🕷️',
+    type: 'beast',
+    size: 'Grande',
+    alignment: 'No alineado',
+    ac: 14,
+    hp: 26,
+    speed: '30 pies, escalar 30 pies',
+    cr: '1',
+    xp: 200,
+    stats: { str: 14, dex: 16, con: 12, int: 2, wis: 11, cha: 4 },
+    skills: { stealth: 7 },
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 10',
+    languages: '—',
+    traits: [
+      { name: 'Escalada de Araña', desc: 'La araña puede escalar superficies difíciles, incluyendo techos, sin necesidad de hacer una prueba de habilidad.' },
+      { name: 'Telaraña', desc: 'La araña puede lanzar telarañas (alcance 30/60 pies). El objetivo queda restringido por la telaraña (CD 12 FUE para escapar).' },
+      { name: 'Sentido de la Telaraña', desc: 'Mientras está en contacto con una telaraña, la araña sabe la localización exacta de cualquier otra criatura en contacto con la misma telaraña.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+5', damage: '1d8+3 perforante', desc: 'El objetivo debe superar CD 11 CON o recibir 2d8 de daño de veneno.' },
+      { name: 'Telaraña', type: 'Especial', desc: 'Rango 30/60 pies. El objetivo queda restringido (CD 12 FUE para escapar).' }
+    ],
+    environments: ['forest', 'underdark', 'swamp'],
+    source: 'mm'
+  },
+  {
+    id: 'winter_wolf',
+    nombre: 'Lobo Invernal',
+    icono: '🐺',
+    type: 'monstrosity',
+    size: 'Grande',
+    alignment: 'Neutral Maligno',
+    ac: 13,
+    hp: 75,
+    speed: '50 pies',
+    cr: '3',
+    xp: 700,
+    stats: { str: 18, dex: 13, con: 14, int: 7, wis: 12, cha: 8 },
+    skills: { perception: 5, stealth: 3 },
+    damageImmunities: 'Frío',
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 15',
+    languages: 'Gigante, Lobo',
+    traits: [
+      { name: 'Aliento de Hielo', desc: 'Recarga 5-6. 15 pies cónico. CD 12 DES o 4d8 frío.' },
+      { name: 'Oído y Olfato Agudos', desc: 'Ventaja en Percepción con oído u olfato.' },
+      { name: 'Ventaja en Manada', desc: 'Ventaja en ataques si un aliado está a 5 pies.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+6', damage: '2d6+4 perforante', desc: 'Si el objetivo es una criatura, CD 14 FUE o derribado.' },
+      { name: 'Aliento de Hielo', type: 'Especial', desc: 'Recarga 5-6. 15 pies cónico. CD 12 DES o 4d8 frío.' }
+    ],
+    environments: ['arctic', 'forest', 'hill'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // CELESTIALES
+  // ════════════════════════════════════════════
+  {
+    id: 'deva',
+    nombre: 'Deva',
+    icono: '👼',
+    type: 'celestial',
+    size: 'Mediano',
+    alignment: 'Legal Bueno',
+    ac: 17,
+    hp: 136,
+    speed: '30 pies, vuelo 90 pies',
+    cr: '10',
+    xp: 5900,
+    stats: { str: 18, dex: 18, con: 18, int: 17, wis: 20, cha: 20 },
+    saves: { wis: 9, cha: 9 },
+    damageResistances: 'Radiante; contundente, perforante y cortante de ataques no mágicos',
+    conditionImmunities: 'Encantado, agotamiento, asustado',
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 15',
+    languages: 'Todos, telepatía 120 pies',
+    traits: [
+      { name: 'Resistencia Mágica', desc: 'El deva tiene ventaja en tiradas de salvación contra hechizos y otros efectos mágicos.' },
+      { name: 'Ataque Innato', desc: 'Los ataques del deva son mágicos. Cuando golpea con cualquier arma, el arma inflige 4d8 de daño radiante extra.' },
+      { name: 'Inmortalidad', desc: 'Si el deva muere, su cuerpo se desintegra y regresa a su plano natal.' }
+    ],
+    actions: [
+      { name: 'Maza', type: 'Ataque', attack: '+8', damage: '1d6+4 contundente + 4d8 radiante', desc: 'Ataque mágico.' },
+      { name: 'Curación', type: 'Especial', desc: 'El deva toca a otra criatura. El objetivo recupera 20 (4d8+2) PG y queda curado de maldiciones, enfermedades, venenos y ceguera/sordera.' }
+    ],
+    spellcasting: {
+      ability: 'cha',
+      dc: 17,
+      attack: 9,
+      spells: ['Detectar el Mal y el Bien', 'Disipar Magia', 'Curar Heridas', 'Invisibilidad', 'Levantar la Maldición', 'Comunión', 'Restauración Mayor', 'Hablar con los Muertos']
+    },
+    environments: ['any'],
+    source: 'mm'
+  },
+  {
+    id: 'pegasus',
+    nombre: 'Pegaso',
+    icono: '🦄',
+    type: 'celestial',
+    size: 'Grande',
+    alignment: 'Caótico Bueno',
+    ac: 12,
+    hp: 59,
+    speed: '60 pies, vuelo 90 pies',
+    cr: '2',
+    xp: 450,
+    stats: { str: 18, dex: 15, con: 16, int: 10, wis: 15, cha: 13 },
+    saves: { wis: 4, cha: 3 },
+    damageImmunities: '—',
+    senses: 'Percepción pasiva 13',
+    languages: 'Entiende Celestial, Común, Elvish y Sylvan pero no puede hablar',
+    traits: [
+      { name: 'Vuelo', desc: 'El pegaso puede volar a gran velocidad.' }
+    ],
+    actions: [
+      { name: 'Cascos', type: 'Ataque', attack: '+6', damage: '2d6+4 contundente', desc: 'Ataque cuerpo a cuerpo.' }
+    ],
+    environments: ['forest', 'grassland', 'mountain'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // CONSTRUCTOS
+  // ════════════════════════════════════════════
+  {
+    id: 'iron_golem',
+    nombre: 'Gólem de Hierro',
+    icono: '🤖',
+    type: 'construct',
+    size: 'Grande',
+    alignment: 'No alineado',
+    ac: 20,
+    hp: 210,
+    speed: '30 pies',
+    cr: '16',
+    xp: 15000,
+    stats: { str: 24, dex: 9, con: 20, int: 3, wis: 11, cha: 1 },
+    damageImmunities: 'Fuego, veneno, psíquico; contundente, perforante y cortante de ataques no mágicos que no sean de adamantina',
+    conditionImmunities: 'Encantado, agotamiento, asustado, paralizado, petrificado, envenenado',
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 10',
+    languages: 'Entiende los idiomas de su creador pero no puede hablar',
+    traits: [
+      { name: 'Inmunidad a la Magia', desc: 'El gólem es inmune a hechizos y efectos mágicos, excepto los que curan o dañan fuego.' },
+      { name: 'Forma Inmutable', desc: 'El gólem es inmune a cualquier hechizo o efecto que alteraría su forma.' },
+      { name: 'Absorción de Fuego', desc: 'Cuando el gólem es dañado por fuego, recupera PG igual al daño de fuego recibido.' },
+      { name: 'Veneno de Magia', desc: 'El gólem emite veneno mágico. Cualquier criatura que comience su turno a 5 pies del gólem debe superar CD 19 CON o envenenada.' }
+    ],
+    actions: [
+      { name: 'Golpe', type: 'Ataque', attack: '+13', damage: '3d8+7 contundente', desc: 'Alcance 5 pies.' },
+      { name: 'Espada', type: 'Ataque', attack: '+13', damage: '3d10+7 cortante', desc: 'El gólem puede usar su espada en lugar de golpes.' }
+    ],
+    environments: ['any'],
+    source: 'mm'
+  },
+  {
+    id: 'flesh_golem',
+    nombre: 'Gólem de Carne',
+    icono: '🧟',
+    type: 'construct',
+    size: 'Mediano',
+    alignment: 'No alineado',
+    ac: 9,
+    hp: 93,
+    speed: '30 pies',
+    cr: '5',
+    xp: 1800,
+    stats: { str: 19, dex: 9, con: 18, int: 6, wis: 10, cha: 5 },
+    damageImmunities: 'Relámpago, veneno; contundente, perforante y cortante de ataques no mágicos que no sean de adamantina',
+    conditionImmunities: 'Encantado, agotamiento, asustado, paralizado, petrificado, envenenado',
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 10',
+    languages: 'Entiende los idiomas de su creador pero no puede hablar',
+    traits: [
+      { name: 'Absorción de Relámpago', desc: 'Cuando el gólem es dañado por relámpago, recupera PG igual al daño de relámpago recibido.' },
+      { name: 'Furia de Berserker', desc: 'Cuando el gólem tiene 40 PG o menos, entra en furia y tiene ventaja en tiradas de ataque.' },
+      { name: 'Inmunidad a la Magia', desc: 'Inmune a hechizos y efectos mágicos, excepto los que curan o dañan relámpago.' }
+    ],
+    actions: [
+      { name: 'Golpes', type: 'Ataque', attack: '+7', damage: '2d8+4 contundente', desc: 'Dos ataques por turno.' }
+    ],
+    environments: ['any'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // DRAGONES
+  // ════════════════════════════════════════════
+  {
+    id: 'ancient_red_dragon',
+    nombre: 'Dragón Rojo Anciano',
+    icono: '🐲',
+    type: 'dragon',
+    size: 'Gargantúa',
+    alignment: 'Caótico Maligno',
+    ac: 22,
+        hp: 546,
+    speed: '40 pies, escalar 40 pies, vuelo 80 pies',
+    cr: '24',
+    xp: 62000,
+    stats: { str: 30, dex: 10, con: 29, int: 18, wis: 15, cha: 23 },
+    saves: { dex: 7, con: 16, wis: 9, cha: 13 },
+    skills: { perception: 16, stealth: 7 },
+    damageImmunities: 'Fuego',
+    senses: 'Vista ciega 60 pies, visión en la oscuridad 120 pies, Percepción pasiva 26',
+    languages: 'Común, Dracónico',
+    traits: [
+      { name: 'Resistencia Legendaria (3/Día)', desc: 'Si el dragón falla una tirada de salvación, puede elegir tener éxito en su lugar.' },
+      { name: 'Aliento de Fuego', desc: 'Recarga 5-6. 90 pies cónico. CD 24 DES o 26d6 fuego.' },
+      { name: 'Presencia Aterradora', desc: 'Criaturas a 120 pies deben superar CD 21 WIS o asustadas 1 minuto.' },
+      { name: 'Ataque de Oportunidad Mejorado', desc: 'El dragón puede realizar un ataque de oportunidad con su cola.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+17', damage: '2d10+10 perforante + 3d6 fuego', desc: 'Alcance 15 pies.' },
+      { name: 'Garras', type: 'Ataque', attack: '+17', damage: '2d6+10 cortante', desc: 'Alcance 10 pies.' },
+      { name: 'Cola', type: 'Ataque', attack: '+17', damage: '2d8+10 contundente', desc: 'Alcance 20 pies.' },
+      { name: 'Aliento de Fuego', type: 'Especial', desc: '90 pies cónico. CD 24 DES o 26d6 fuego.' },
+      { name: 'Presencia Aterradora', type: 'Especial', desc: 'CD 21 WIS o asustado.' }
+    ],
+    legendary: {
+      actions: 3,
+      desc: 'El dragón puede realizar 3 acciones legendarias.',
+      options: [
+        { name: 'Detectar', desc: 'Prueba de Sabiduría (Percepción).' },
+        { name: 'Ataque de Cola', desc: 'Ataque de cola.' },
+        { name: 'Ataque de Ala', desc: 'Vuela hasta la mitad de su velocidad y ataca con las alas (2d6+10 contundente).' }
+      ]
+    },
+    environments: ['hill', 'mountain'],
+    source: 'mm'
+  },
+  {
+    id: 'adult_black_dragon',
+    nombre: 'Dragón Negro Adulto',
+    icono: '🐉',
+    type: 'dragon',
+    size: 'Enorme',
+    alignment: 'Caótico Maligno',
+    ac: 19,
+    hp: 195,
+    speed: '40 pies, escalar 40 pies, vuelo 80 pies, nadar 40 pies',
+    cr: '14',
+    xp: 11500,
+    stats: { str: 23, dex: 14, con: 21, int: 14, wis: 13, cha: 17 },
+    saves: { dex: 7, con: 10, wis: 6, cha: 8 },
+    skills: { perception: 11, stealth: 7 },
+    damageImmunities: 'Ácido',
+    senses: 'Vista ciega 60 pies, visión en la oscuridad 120 pies, Percepción pasiva 21',
+    languages: 'Común, Dracónico',
+    traits: [
+      { name: 'Anfibio', desc: 'El dragón puede respirar aire y agua.' },
+      { name: 'Resistencia Legendaria (3/Día)', desc: 'Puede elegir tener éxito en una salvación fallida.' },
+      { name: 'Aliento de Ácido', desc: '90 pies línea. CD 19 DES o 12d8 ácido.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+11', damage: '2d10+6 perforante + 2d6 ácido', desc: 'Alcance 10 pies.' },
+      { name: 'Garras', type: 'Ataque', attack: '+11', damage: '2d6+6 cortante', desc: 'Alcance 5 pies.' },
+      { name: 'Aliento de Ácido', type: 'Especial', desc: '90 pies línea. CD 19 DES o 12d8 ácido.' }
+    ],
+    legendary: {
+      actions: 3,
+      desc: 'El dragón puede realizar 3 acciones legendarias.',
+      options: [
+        { name: 'Detectar', desc: 'Prueba de Percepción.' },
+        { name: 'Ataque de Cola', desc: 'Ataque de cola.' },
+        { name: 'Ataque de Ala', desc: 'Ataque con alas.' }
+      ]
+    },
+    environments: ['swamp'],
+    source: 'mm'
+  },
+  {
+    id: 'young_green_dragon',
+    nombre: 'Dragón Verde Joven',
+    icono: '🐲',
+    type: 'dragon',
+    size: 'Grande',
+    alignment: 'Legal Maligno',
+    ac: 18,
+    hp: 136,
+    speed: '40 pies, escalar 40 pies, vuelo 80 pies, nadar 40 pies',
+    cr: '8',
+    xp: 3900,
+    stats: { str: 19, dex: 12, con: 17, int: 16, wis: 13, cha: 15 },
+    saves: { dex: 5, con: 7, wis: 4, cha: 6 },
+    skills: { deception: 7, insight: 4, perception: 8, persuasion: 7, stealth: 5 },
+    damageImmunities: 'Veneno',
+    conditionImmunities: 'Envenenado',
+    senses: 'Vista ciega 30 pies, visión en la oscuridad 120 pies, Percepción pasiva 18',
+    languages: 'Común, Dracónico',
+    traits: [
+      { name: 'Anfibio', desc: 'Puede respirar aire y agua.' },
+      { name: 'Aliento de Gas Venenoso', desc: '60 pies cónico. CD 14 CON o 12d6 veneno.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+7', damage: '2d10+4 perforante + 2d6 veneno', desc: 'Alcance 10 pies.' },
+      { name: 'Garras', type: 'Ataque', attack: '+7', damage: '2d6+4 cortante', desc: 'Alcance 5 pies.' },
+      { name: 'Aliento de Gas Venenoso', type: 'Especial', desc: '60 pies cónico. CD 14 CON o 12d6 veneno.' }
+    ],
+    environments: ['forest', 'swamp'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // ELEMENTALES
+  // ════════════════════════════════════════════
+  {
+    id: 'fire_elemental',
+    nombre: 'Elemental de Fuego',
+    icono: '🔥',
+    type: 'elemental',
+    size: 'Grande',
+    alignment: 'Neutral',
+    ac: 13,
+    hp: 102,
+    speed: '50 pies',
+    cr: '5',
+    xp: 1800,
+    stats: { str: 10, dex: 17, con: 16, int: 6, wis: 10, cha: 7 },
+    damageResistances: 'Contundente, perforante y cortante de ataques no mágicos',
+    damageImmunities: 'Fuego, veneno',
+    conditionImmunities: 'Agotamiento, agarrado, paralizado, petrificado, envenenado, derribado, restringido, inconsciente',
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 10',
+    languages: 'Ignano',
+    traits: [
+      { name: 'Forma de Fuego', desc: 'El elemental puede moverse a través de un espacio tan estrecho como 1 pulgada sin apretarse.' },
+      { name: 'Iluminación', desc: 'El elemental arroja luz brillante en 30 pies y luz tenue en 30 pies adicionales.' },
+      { name: 'Toque Ígneo', desc: 'Cualquier criatura que toque o golpee cuerpo a cuerpo al elemental recibe 1d10 fuego.' },
+      { name: 'Inflamable', desc: 'Cualquier criatura que toque al elemental y sea inflamable (como llevar madera, papel o paja) debe superar CD 13 DES o prenderse fuego.' }
+    ],
+    actions: [
+      { name: 'Toque', type: 'Ataque', attack: '+6', damage: '2d6+3 fuego', desc: 'Si el objetivo es inflamable, prende fuego.' },
+      { name: 'Golpe de Fuego', type: 'Ataque', attack: '+6', damage: '2d8+3 fuego', desc: 'Ataque cuerpo a cuerpo.' }
+    ],
+    environments: ['desert', 'mountain'],
+    source: 'mm'
+  },
+  {
+    id: 'water_elemental',
+    nombre: 'Elemental de Agua',
+    icono: '💧',
+    type: 'elemental',
+    size: 'Grande',
+    alignment: 'Neutral',
+    ac: 14,
+    hp: 114,
+    speed: '30 pies, nadar 90 pies',
+    cr: '5',
+    xp: 1800,
+    stats: { str: 18, dex: 14, con: 18, int: 5, wis: 10, cha: 8 },
+    damageResistances: 'Ácido; contundente, perforante y cortante de ataques no mágicos',
+    damageImmunities: 'Veneno',
+    conditionImmunities: 'Agotamiento, agarrado, paralizado, petrificado, envenenado, derribado, restringido, inconsciente',
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 10',
+    languages: 'Acuán',
+    traits: [
+      { name: 'Forma de Agua', desc: 'Puede entrar en el espacio de otras criaturas y detenerse allí.' },
+      { name: 'Ahogar', desc: 'Cualquier criatura que entre en el espacio del elemental o comience su turno allí debe superar CD 13 FUE o quedar agarrada (ahogándose).' }
+    ],
+    actions: [
+      { name: 'Golpes', type: 'Ataque', attack: '+7', damage: '2d8+4 contundente', desc: 'Dos ataques.' },
+      { name: 'Estrujar', type: 'Especial', desc: 'Una criatura agarrada recibe 2d8+4 contundente y no puede respirar.' }
+    ],
+    environments: ['underwater', 'coastal', 'swamp'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // FEY
+  // ════════════════════════════════════════════
+  {
+    id: 'green_hag',
+    nombre: 'Bruja Verde',
+    icono: '🧙‍♀️',
+    type: 'fey',
+    size: 'Mediano',
+    alignment: 'Neutral Maligno',
+    ac: 17,
+    hp: 82,
+    speed: '30 pies',
+    cr: '3',
+    xp: 700,
+    stats: { str: 18, dex: 12, con: 16, int: 13, wis: 14, cha: 14 },
+    skills: { arcana: 3, deception: 4, insight: 4, perception: 4, stealth: 3 },
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 14',
+    languages: 'Común, Dracónico, Sylvan',
+    traits: [
+      { name: 'Resistencia Mágica', desc: 'Ventaja en salvaciones contra hechizos.' },
+      { name: 'Ilusión Innata', desc: 'La bruja puede lanzar Disfrace Mayor sobre sí misma a voluntad.' },
+      { name: 'Mimicry', desc: 'La bruja puede imitar sonidos de animales y humanoides.' }
+    ],
+    actions: [
+      { name: 'Garras', type: 'Ataque', attack: '+6', damage: '2d8+4 cortante', desc: 'Ataque cuerpo a cuerpo.' },
+      { name: 'Mirada Horrible', type: 'Especial', desc: '30 pies. CD 13 WIS o asustado 1 minuto.' },
+      { name: 'Maleficio', type: 'Especial', desc: 'Toque. CD 13 WIS o maldito. La maldición dura hasta ser removida o la bruja muera.' }
+    ],
+    spellcasting: {
+      ability: 'int',
+      dc: 13,
+      attack: 5,
+      spells: ['Disfrace Mayor', 'Rayo de Enfermedad', 'Miedo', 'Identificar', 'Localizar Animales o Plantas']
+    },
+    environments: ['swamp', 'forest'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // INFERNALES
+  // ════════════════════════════════════════════
+  {
+    id: 'pit_fiend',
+    nombre: 'Señor del Abismo',
+    icono: '👹',
+    type: 'fiend',
+    size: 'Grande',
+    alignment: 'Legal Maligno',
+    ac: 19,
+    hp: 300,
+    speed: '30 pies, vuelo 60 pies',
+    cr: '20',
+    xp: 25000,
+    stats: { str: 26, dex: 14, con: 24, int: 22, wis: 18, cha: 24 },
+    saves: { str: 14, dex: 8, con: 13, int: 12, wis: 10, cha: 12 },
+    damageResistances: 'Frío; contundente, perforante y cortante de ataques no mágicos que no sean de plata',
+    damageImmunities: 'Fuego, veneno',
+    conditionImmunities: 'Envenenado',
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 14',
+    languages: 'Infernal, telepatía 120 pies',
+    traits: [
+      { name: 'Resistencia Mágica', desc: 'Ventaja en salvaciones contra hechizos.' },
+      { name: 'Armas Mágicas', desc: 'Los ataques del señor son mágicos.' },
+      { name: 'Aura de Miedo', desc: 'Criaturas a 20 pies deben superar CD 21 WIS o asustadas.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+14', damage: '4d6+8 perforante + 2d6 veneno', desc: 'El objetivo debe superar CD 21 CON o envenenado.' },
+      { name: 'Garras', type: 'Ataque', attack: '+14', damage: '2d8+8 cortante', desc: 'Dos ataques.' },
+      { name: 'Maza', type: 'Ataque', attack: '+14', damage: '2d6+8 contundente + 2d6 fuego', desc: 'Ataque con maza.' }
+    ],
+    spellcasting: {
+      ability: 'cha',
+      dc: 21,
+      attack: 13,
+      spells: ['Detectar Magia', 'Fuego Infernal', 'Muro de Fuego', 'Sugestión', 'Teletransporte']
+    },
+    environments: ['any'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // GIGANTES
+  // ════════════════════════════════════════════
+  {
+    id: 'frost_giant',
+    nombre: 'Gigante de Escarcha',
+    icono: '❄️',
+    type: 'giant',
+    size: 'Enorme',
+    alignment: 'Neutral Maligno',
+    ac: 15,
+    hp: 138,
+    speed: '40 pies',
+    cr: '8',
+    xp: 3900,
+    stats: { str: 23, dex: 9, con: 21, int: 9, wis: 10, cha: 12 },
+    saves: { con: 8, wis: 3, cha: 4 },
+    skills: { athletics: 9, perception: 3 },
+    damageImmunities: 'Frío',
+    senses: 'Percepción pasiva 13',
+    languages: 'Gigante',
+    traits: [
+      { name: 'Resistencia al Frío', desc: 'Inmunidad al daño de frío.' }
+    ],
+    actions: [
+      { name: 'Hacha', type: 'Ataque', attack: '+9', damage: '3d12+6 cortante', desc: 'Alcance 10 pies.' },
+      { name: 'Roca', type: 'Ataque', attack: '+9', damage: '4d10+6 contundente', desc: 'Rango 60/240 pies.' }
+    ],
+    environments: ['arctic', 'mountain'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // HUMANOIDES
+  // ════════════════════════════════════════════
+  {
+    id: 'orc_war_chief',
+    nombre: 'Jefe de Guerra Orco',
+    icono: '👺',
+    type: 'humanoid',
+    size: 'Mediano',
+    alignment: 'Caótico Maligno',
+    ac: 16,
+    hp: 93,
+    speed: '30 pies',
+    cr: '4',
+    xp: 1100,
+    stats: { str: 18, dex: 12, con: 18, int: 11, wis: 11, cha: 16 },
+    saves: { str: 6, con: 6, wis: 2, cha: 5 },
+    skills: { intimidation: 5, survival: 2 },
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 10',
+    languages: 'Común, Orco',
+    traits: [
+      { name: 'Agresivo', desc: 'Como acción adicional, el orco puede moverse hasta su velocidad hacia un enemigo que pueda ver.' },
+      { name: 'Gruñido de Batalla', desc: '1/día. 30 pies. Aliados tienen ventaja en ataques hasta el siguiente turno del jefe.' },
+      { name: 'Ataque Coordinado', desc: 'El jefe tiene ventaja en ataques si un aliado está a 5 pies del objetivo.' }
+    ],
+    actions: [
+      { name: 'Espada', type: 'Ataque', attack: '+6', damage: '1d12+4 cortante', desc: 'Dos ataques.' },
+      { name: 'Jabalina', type: 'Ataque', attack: '+6', damage: '1d6+4 perforante', desc: 'Rango 30/120 pies.' }
+    ],
+    environments: ['grassland', 'hill', 'mountain', 'forest'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // MONSTRUOSIDADES
+  // ════════════════════════════════════════════
+  {
+    id: 'manticore',
+    nombre: 'Mantícora',
+    icono: '🦁',
+    type: 'monstrosity',
+    size: 'Grande',
+    alignment: 'Legal Maligno',
+    ac: 14,
+    hp: 68,
+    speed: '30 pies, vuelo 50 pies',
+    cr: '3',
+    xp: 700,
+    stats: { str: 17, dex: 16, con: 17, int: 7, wis: 12, cha: 8 },
+    senses: 'Visión en la oscuridad 60 pies, Percepción pasiva 11',
+    languages: 'Común',
+    traits: [
+      { name: 'Cola de Espinas', desc: '24 espinas. Rango 100/200 pies. +5 al ataque, 1d8+3 perforante.' }
+    ],
+    actions: [
+      { name: 'Mordisco', type: 'Ataque', attack: '+5', damage: '1d8+3 perforante', desc: 'Ataque cuerpo a cuerpo.' },
+      { name: 'Garras', type: 'Ataque', attack: '+5', damage: '2d4+3 cortante', desc: 'Ataque cuerpo a cuerpo.' },
+      { name: 'Espinas de Cola', type: 'Ataque', attack: '+5', damage: '1d8+3 perforante', desc: '24 espinas disponibles. Recarga 1d6+4 al completar descanso corto.' }
+    ],
+    environments: ['hill', 'mountain'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // LIMOS
+  // ════════════════════════════════════════════
+  {
+    id: 'black_pudding',
+    nombre: 'Pudín Negro',
+    icono: '🌑',
+    type: 'ooze',
+    size: 'Grande',
+    alignment: 'No alineado',
+    ac: 7,
+    hp: 85,
+    speed: '20 pies, escalar 20 pies',
+    cr: '4',
+    xp: 1100,
+    stats: { str: 16, dex: 5, con: 16, int: 1, wis: 6, cha: 1 },
+    damageImmunities: 'Ácido, frío, relámpago, cortante',
+    conditionImmunities: 'Cegado, encantado, sordo, agotamiento, asustado, prone',
+    senses: 'Cegado con sentidos de vibración 60 pies, Percepción pasiva 8',
+    traits: [
+      { name: 'Forma Amorfa', desc: 'Puede moverse a través de espacios de 1 pulgada.' },
+      { name: 'Corrosivo', desc: 'Metal no mágico que toca se disuelve. Armas de metal reciben -1 a daño.' },
+      { name: 'División', desc: 'Cuando recibe daño de relámpago o cortante, se divide en dos puddings con la mitad de PG.' }
+    ],
+    actions: [
+      { name: 'Golpe Pseudópodo', type: 'Ataque', attack: '+5', damage: '1d6+3 contundente + 4d8 ácido', desc: 'El ácido daña también armadura.' }
+    ],
+    environments: ['underdark'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // PLANTAS
+  // ════════════════════════════════════════════
+  {
+    id: 'treant',
+    nombre: 'Ent',
+    icono: '🌳',
+    type: 'plant',
+    size: 'Enorme',
+    alignment: 'Caótico Bueno',
+    ac: 16,
+    hp: 138,
+    speed: '30 pies',
+    cr: '9',
+    xp: 5000,
+    stats: { str: 23, dex: 8, con: 21, int: 12, wis: 16, cha: 12 },
+    damageResistances: 'Contundente, perforante',
+    damageVulnerabilities: 'Fuego',
+    senses: 'Percepción pasiva 13',
+    languages: 'Común, Druidico, Elvish, Sylvan',
+    traits: [
+      { name: 'Falsa Apariencia', desc: 'Mientras permanece inmóvil, es indistinguible de un árbol normal.' },
+      { name: 'Animar Árboles', desc: '1/día. Puede animar hasta 2 árboles dentro de 60 pies.' }
+    ],
+    actions: [
+      { name: 'Golpes', type: 'Ataque', attack: '+10', damage: '3d6+6 contundente', desc: 'Dos ataques.' },
+      { name: 'Lanzar Roca', type: 'Ataque', attack: '+10', damage: '4d10+6 contundente', desc: 'Rango 60/180 pies.' }
+    ],
+    environments: ['forest'],
+    source: 'mm'
+  },
+
+  // ════════════════════════════════════════════
+  // NO MUERTOS
+  // ════════════════════════════════════════════
+  {
+    id: 'lich',
+    nombre: 'Liche',
+    icono: '💀',
+    type: 'undead',
+    size: 'Mediano',
+    alignment: 'Cualquiera Maligno',
+    ac: 17,
+    hp: 135,
+    speed: '30 pies',
+    cr: '21',
+    xp: 33000,
+    stats: { str: 11, dex: 16, con: 16, int: 20, wis: 14, cha: 16 },
+    saves: { con: 10, int: 12, wis: 9, cha: 10 },
+    damageResistances: 'Frío, relámpago, necrotico',
+    damageImmunities: 'Veneno; contundente, perforante y cortante de ataques no mágicos',
+    conditionImmunities: 'Encantado, agotamiento, asustado, paralizado, envenenado',
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 12',
+    languages: 'Común, más 8 idiomas a elección',
+    traits: [
+      { name: 'Resistencia Legendaria (3/Día)', desc: 'Puede elegir tener éxito en una salvación fallida.' },
+      { name: 'Rejuvenecimiento', desc: 'Si tiene su filacteria, resucita en 1d10 días.' },
+      { name: 'Toque Desecador', desc: 'Toque. CD 18 CON o 3d6 necrotico y reduce máximo de PG.' },
+      { name: 'Disipar Magia', desc: 'A voluntad como acción.' }
+    ],
+    actions: [
+      { name: 'Toque Paralizante', type: 'Ataque', attack: '+9', damage: '3d6 frío', desc: 'CD 18 CON o paralizado 1 minuto.' },
+      { name: 'Rayo de Disrupción', type: 'Especial', desc: 'Rango 60 pies. CD 18 DES o 6d6+40 necrotico.' }
+    ],
+    legendary: {
+      actions: 3,
+      desc: 'El liche puede realizar 3 acciones legendarias.',
+      options: [
+        { name: 'Ataque de Toque', desc: 'Realiza un ataque de toque.' },
+        { name: 'Hechizo', desc: 'Lanza un hechizo de nivel 1 o 2.' },
+        { name: 'Mirada Aterradora', desc: '30 pies. CD 18 WIS o asustado 1 minuto.' }
+      ]
+    },
+    spellcasting: {
+      ability: 'int',
+      dc: 20,
+      attack: 12,
+      slots: '4/3/3/3/3/2/2/1/1',
+      spells: ['Rayo de Debilitamiento', 'Proyectil Mágico', 'Detectar Magia', 'Identificar', 'Escudo', 'Dormir', 'Rayo Ácido', 'Detectar Pensamientos', 'Velocidad', 'Contraconjuro', 'Descarga de Relámpago', 'Disipar Magia', 'Miedo', 'Lentificar', 'Matar', 'Confusión', 'Dominar Persona', 'Muro de Hielo', 'Ojo de la Muerte', 'Prisión de Fuerza', 'Rayo Solar', 'Teletransporte', 'Palabra de Poder Matar', 'Controlar el Clima', 'Muro de Fuerza', 'Proyección Astral', 'Dominar Monstruo', 'Puerta Dimensional', 'Esfera de Aniquilación', 'Deseo']
+    },
+    environments: ['any'],
+    source: 'mm'
+  },
+  {
+    id: 'vampire',
+    nombre: 'Vampiro',
+    icono: '🧛',
+    type: 'undead',
+    size: 'Mediano',
+    alignment: 'Legal Maligno',
+    ac: 16,
+    hp: 144,
+    speed: '30 pies',
+    cr: '13',
+    xp: 10000,
+    stats: { str: 18, dex: 18, con: 18, int: 17, wis: 15, cha: 18 },
+    saves: { dex: 9, wis: 7, cha: 9 },
+    skills: { perception: 7, stealth: 9 },
+    damageResistances: 'Necrotico; contundente, perforante y cortante de ataques no mágicos',
+    damageImmunities: 'Veneno',
+    conditionImmunities: 'Agotamiento, envenenado',
+    senses: 'Visión en la oscuridad 120 pies, Percepción pasiva 17',
+    languages: 'Idiomas que conocía en vida',
+    traits: [
+      { name: 'Resistencia Legendaria (3/Día)', desc: 'Puede elegir tener éxito en una salvación fallida.' },
+      { name: 'Regeneración', desc: 'Recupera 20 PG al inicio de su turno si no recibe daño radiante o sagrado.' },
+      { name: 'Forma de Niebla', desc: 'Puede transformarse en niebla.' },
+      { name: 'Forma de Murciélago', desc: 'Puede transformarse en murciélago.' },
+      { name: 'Vampiro Nacido de la Sangre', desc: 'Puede crear vampiros esclavos al matar con su mordisco.' },
+      { name: 'Anfitrión de la Noche', desc: 'No puede entrar a una residencia sin invitación.' },
+      { name: 'Daño por Agua Corriente', desc: 'Recibe 20 daño de ácido si termina su turno en agua corriente.' },
+      { name: 'Estaca en el Corazón', desc: 'Si se le reduce a 0 PG por una estaca de madera, queda paralizado.' }
+    ],
+    actions: [
+      { name: 'Golpe', type: 'Ataque', attack: '+9', damage: '1d8+4 contundente', desc: 'Dos ataques.' },
+      { name: 'Mordisco', type: 'Ataque', attack: '+9', damage: '1d6+4 perforante + 3d6 necrotico', desc: 'El objetivo reduce su máximo de PG igual al daño necrotico.' },
+      { name: 'Encantar', type: 'Especial', desc: '30 pies. CD 17 WIS o encantado 1 minuto.' }
+    ],
+    legendary: {
+      actions: 3,
+      desc: 'El vampiro puede realizar 3 acciones legendarias.',
+      options: [
+        { name: 'Moverse', desc: 'Se mueve sin provocar ataques de oportunidad.' },
+        { name: 'Mordisco', desc: 'Realiza un ataque de mordisco.' },
+        { name: 'Golpear', desc: 'Realiza un ataque de golpe.' }
+      ]
+    },
+    environments: ['urban', 'underdark'],
+    source: 'mm'
+  }
+];
+
+/* =====================================================
+   VARIABLES GLOBALES Y ESTADO
+   ===================================================== */
+let currentCreatures = [...CREATURES];
+let selectedCreature = null;
+let currentPage = 1;
+const ITEMS_PER_PAGE = 12;
+
+/* =====================================================
+   INICIALIZACIÓN
+   ===================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  initFilters();
+  filterAndRender();
+});
+
+function initFilters() {
+  // Chips de tipo
+  document.querySelectorAll('#typeChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#typeChips .chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+      filterAndRender();
+    });
+  });
+
+  // Chips de tamaño
+  document.querySelectorAll('#sizeChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#sizeChips .chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+      filterAndRender();
+    });
+  });
+
+  // Chips de ambiente
+  document.querySelectorAll('#envChips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#envChips .chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+      filterAndRender();
+    });
+  });
+}
+
+/* =====================================================
+   FILTRADO Y RENDERIZADO
+   ===================================================== */
+function filterAndRender() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const typeChip = document.querySelector('#typeChips .chip.on');
+  const type = typeChip ? typeChip.dataset.type : 'all';
+  const sizeChip = document.querySelector('#sizeChips .chip.on');
+  const size = sizeChip ? sizeChip.dataset.size : 'all';
+  const envChip = document.querySelector('#envChips .chip.on');
+  const env = envChip ? envChip.dataset.env : 'all';
+  const crMin = parseFloat(document.getElementById('crMin').value) || 0;
+  const crMax = parseFloat(document.getElementById('crMax').value) || 999;
+  const sort = document.getElementById('sortSel').value;
+
+  // Filtros de habilidades especiales
+  const legendary = document.querySelector('[data-ability="legendary"]').checked;
+  const spellcasting = document.querySelector('[data-ability="spellcasting"]').checked;
+  const fly = document.querySelector('[data-ability="fly"]').checked;
+  const swim = document.querySelector('[data-ability="swim"]').checked;
+  const darkvision = document.querySelector('[data-ability="darkvision"]').checked;
+
+  currentCreatures = CREATURES.filter(c => {
+    // Búsqueda por nombre
+    if (search && !c.nombre.toLowerCase().includes(search)) return false;
+    
+    // Filtro por tipo
+    if (type !== 'all' && c.type !== type) return false;
+    
+    // Filtro por tamaño
+    if (size !== 'all' && c.size !== size) return false;
+    
+    // Filtro por ambiente
+    if (env !== 'all' && (!c.environments || !c.environments.includes(env))) return false;
+    
+    // Filtro por CR
+    const cr = parseFloat(c.cr) || 0;
+    if (cr < crMin || cr > crMax) return false;
+    
+    // Filtros de habilidades
+    if (legendary && !c.legendary) return false;
+    if (spellcasting && !c.spellcasting) return false;
+    if (fly && (!c.speed || !c.speed.includes('vuelo'))) return false;
+    if (swim && (!c.speed || !c.speed.includes('nadar'))) return false;
+    if (darkvision && (!c.senses || !c.senses.includes('Visión en la oscuridad'))) return false;
+    
+    return true;
+  });
+
+  // Ordenamiento
+  currentCreatures.sort((a, b) => {
+    switch(sort) {
+      case 'nombre': return a.nombre.localeCompare(b.nombre);
+      case 'nombre_desc': return b.nombre.localeCompare(a.nombre);
+      case 'cr_asc': return (parseFloat(a.cr) || 0) - (parseFloat(b.cr) || 0);
+      case 'cr_desc': return (parseFloat(b.cr) || 0) - (parseFloat(a.cr) || 0);
+      case 'hp_asc': return a.hp - b.hp;
+      case 'hp_desc': return b.hp - a.hp;
+      default: return 0;
+    }
+  });
+
+  currentPage = 1;
+  renderGrid();
+  renderPagination();
+  updateCount();
+}
+
+function updateCount() {
+  document.getElementById('countNum').textContent = currentCreatures.length;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('creaturesGrid');
+  grid.innerHTML = '';
+  
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  const end = start + ITEMS_PER_PAGE;
+  const pageCreatures = currentCreatures.slice(start, end);
+
+  if (pageCreatures.length === 0) {
+    grid.innerHTML = `
+      <div class="empty" style="grid-column: 1/-1;">
+        <span>🐉</span>
+        <p>No se encontraron criaturas con esos filtros.</p>
+      </div>
+    `;
+    return;
+  }
+
+  pageCreatures.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'creature-card';
+    if (selectedCreature && selectedCreature.id === c.id) {
+      card.classList.add('selected');
+    }
+    card.style.setProperty('--type-color', getTypeColor(c.type));
+    card.onclick = () => showDetail(c);
+    
+    // Tags de tamaño y tipo
+    const sizeClass = `tag-size-${getSizeKey(c.size)}`;
+    const typeClass = `tag-type-${c.type}`;
+    
+    card.innerHTML = `
+      <div class="creature-header">
+        <div class="creature-icon">${c.icono}</div>
+        <div class="creature-title">
+          <div class="creature-name">${c.nombre}</div>
+          <div class="creature-meta">${c.size} · ${getTypeName(c.type)} · CD ${c.cr}</div>
+        </div>
+      </div>
+      <div class="creature-stats">
+        <div class="stat-box">
+          <div class="stat-label">CA</div>
+          <div class="stat-value">${c.ac}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">PG</div>
+          <div class="stat-value">${c.hp}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">XP</div>
+          <div class="stat-value">${c.xp}</div>
+        </div>
+      </div>
+      <div class="creature-traits">
+        ${c.traits ? c.traits.slice(0, 2).map(t => t.name).join(', ') : ''}
+      </div>
+      <div class="creature-tags">
+        <span class="tag ${sizeClass}">${c.size}</span>
+        <span class="tag ${typeClass}">${getTypeName(c.type)}</span>
+        ${c.legendary ? '<span class="tag" style="border-color:var(--red);color:var(--red);">Legendario</span>' : ''}
+        ${c.spellcasting ? '<span class="tag" style="border-color:var(--purple);color:var(--purple);">Hechicero</span>' : ''}
+      </div>
+    `;
+    
+    grid.appendChild(card);
+  });
+}
+
+function renderPagination() {
+  const totalPages = Math.ceil(currentCreatures.length / ITEMS_PER_PAGE);
+  const pagination = document.getElementById('pagination');
+  
+  if (totalPages <= 1) {
+    pagination.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  
+  // Botón anterior
+  html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>←</button>`;
+  
+  // Páginas
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+      html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+    } else if (i === currentPage - 3 || i === currentPage + 3) {
+      html += `<span style="color:var(--muted);">…</span>`;
+    }
+  }
+  
+  // Botón siguiente
+  html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>→</button>`;
+  
+  pagination.innerHTML = html;
+}
+
+function changePage(page) {
+  const totalPages = Math.ceil(currentCreatures.length / ITEMS_PER_PAGE);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderGrid();
+  renderPagination();
+  document.querySelector('.main').scrollTop = 0;
+}
+
+/* =====================================================
+   PANEL DE DETALLES
+   ===================================================== */
+function showDetail(creature) {
+  selectedCreature = creature;
+  const panel = document.getElementById('detailPanel');
+  const content = document.getElementById('detailContent');
+  
+  // Marcar seleccionado en grid
+  document.querySelectorAll('.creature-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  // Construir contenido
+  let html = `
+    <span class="detail-icon">${creature.icono}</span>
+    <h2 class="detail-name">${creature.nombre}</h2>
+    <div class="detail-meta">${creature.size} ${getTypeName(creature.type)} · CD ${creature.cr} · ${creature.alignment}</div>
+    
+    <div class="stats-block">
+      <div class="stat-box-detail">
+        <div class="stat-label">Clase de Armadura</div>
+        <div class="stat-value">${creature.ac}</div>
+      </div>
+      <div class="stat-box-detail">
+        <div class="stat-label">Puntos de Golpe</div>
+        <div class="stat-value">${creature.hp}</div>
+      </div>
+      <div class="stat-box-detail">
+        <div class="stat-label">Velocidad</div>
+        <div class="stat-value" style="font-size:0.9rem;">${creature.speed}</div>
+      </div>
+      <div class="stat-box-detail">
+        <div class="stat-label">Desafío</div>
+        <div class="stat-value">${creature.cr}</div>
+        <div class="stat-sub">${creature.xp} XP</div>
+      </div>
+    </div>
+  `;
+
+  // Puntuaciones de habilidad
+  if (creature.stats) {
+    html += `<div class="ability-grid">`;
+    const abilities = [
+      { key: 'str', name: 'FUE' },
+      { key: 'dex', name: 'DES' },
+      { key: 'con', name: 'CON' },
+      { key: 'int', name: 'INT' },
+      { key: 'wis', name: 'SAB' },
+      { key: 'cha', name: 'CAR' }
+    ];
+    
+    abilities.forEach(ab => {
+      const score = creature.stats[ab.key];
+      const mod = Math.floor((score - 10) / 2);
+      const modStr = mod >= 0 ? `+${mod}` : mod;
+      html += `
+        <div class="ability-item">
+          <span class="ability-name">${ab.name}</span>
+          <span class="ability-score">${score} <span class="ability-mod">(${modStr})</span></span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  // Sentidos e idiomas
+  html += `<div class="detail-section">`;
+  html += `<h4>Información</h4>`;
+  if (creature.senses) html += `<p class="detail-desc"><strong>Sentidos:</strong> ${creature.senses}</p>`;
+  if (creature.languages) html += `<p class="detail-desc"><strong>Idiomas:</strong> ${creature.languages}</p>`;
+  if (creature.damageImmunities) html += `<p class="detail-desc"><strong>Inmunidades:</strong> ${creature.damageImmunities}</p>`;
+  if (creature.damageResistances) html += `<p class="detail-desc"><strong>Resistencias:</strong> ${creature.damageResistances}</p>`;
+  if (creature.damageVulnerabilities) html += `<p class="detail-desc"><strong>Vulnerabilidades:</strong> ${creature.damageVulnerabilities}</p>`;
+  html += `</div>`;
+
+  // Rasgos
+  if (creature.traits && creature.traits.length > 0) {
+    html += `<div class="detail-section"><h4>Rasgos</h4>`;
+    creature.traits.forEach(trait => {
+      html += `
+        <div class="trait-item">
+          <div class="trait-name">${trait.name}</div>
+          <div class="trait-desc">${trait.desc}</div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  // Acciones
+  if (creature.actions && creature.actions.length > 0) {
+    html += `<div class="detail-section"><h4>Acciones</h4>`;
+    creature.actions.forEach(action => {
+      html += `
+        <div class="action-item">
+          <div class="action-name">
+            ${action.name}
+            <span class="action-type">${action.type}</span>
+          </div>
+          <div class="action-desc">${action.desc}</div>
+          ${action.attack ? `<div class="action-attack">Ataque: ${action.attack}</div>` : ''}
+          ${action.damage ? `<div class="action-damage">Daño: ${action.damage}</div>` : ''}
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  // Lanzamiento de hechizos
+  if (creature.spellcasting) {
+    html += `<div class="detail-section"><h4>Lanzamiento de Hechizos</h4>`;
+    html += `<p class="detail-desc">Habilidad: ${creature.spellcasting.ability.toUpperCase()} · CD ${creature.spellcasting.dc} · Ataque +${creature.spellcasting.attack}</p>`;
+    if (creature.spellcasting.slots) {
+      html += `<p class="detail-desc"><strong>Ranuras:</strong> ${creature.spellcasting.slots}</p>`;
+    }
+    html += `<div class="trait-item"><div class="trait-desc">Hechizos: ${creature.spellcasting.spells.join(', ')}</div></div>`;
+    html += `</div>`;
+  }
+
+  // Acciones legendarias
+  if (creature.legendary) {
+    html += `<div class="detail-section"><h4>Acciones Legendarias</h4>`;
+    html += `<div class="legendary-section">`;
+    html += `<div class="legendary-title">${creature.legendary.actions} acciones por ronda</div>`;
+    html += `<p class="detail-desc">${creature.legendary.desc}</p>`;
+    if (creature.legendary.options) {
+      creature.legendary.options.forEach(opt => {
+        html += `
+          <div class="trait-item" style="border-left-color:var(--red);">
+            <div class="trait-name" style="color:var(--red2);">${opt.name}</div>
+            <div class="trait-desc">${opt.desc}</div>
+          </div>
+        `;
+      });
+    }
+    html += `</div></div>`;
+  }
+
+  // Tags finales
+  html += `<div class="detail-tags">`;
+  html += `<span class="detail-tag" style="border-color:${getTypeColor(creature.type)};color:${getTypeColor(creature.type)}">${getTypeName(creature.type)}</span>`;
+  html += `<span class="detail-tag" style="border-color:var(--gold);color:var(--gold)">${creature.size}</span>`;
+  if (creature.environments) {
+    creature.environments.forEach(env => {
+      html += `<span class="detail-tag">${getEnvName(env)}</span>`;
+    });
+  }
+  html += `</div>`;
+
+  content.innerHTML = html;
+  panel.classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('open');
+  selectedCreature = null;
+  document.querySelectorAll('.creature-card').forEach(c => c.classList.remove('selected'));
+}
+
+/* =====================================================
+   UTILIDADES
+   ===================================================== */
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('crMin').value = '';
+  document.getElementById('crMax').value = '';
+  document.getElementById('sortSel').value = 'nombre';
+  
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  document.querySelector('[data-type="all"]').classList.add('on');
+  document.querySelector('[data-size="all"]').classList.add('on');
+  document.querySelector('[data-env="all"]').classList.add('on');
+  
+  document.querySelectorAll('#abilityFilters input').forEach(i => i.checked = false);
+  
+  filterAndRender();
+}
+
+function getTypeColor(type) {
+  const colors = {
+    aberration: '#9c27b0',
+    beast: '#8bc34a',
+    celestial: '#ffeb3b',
+    construct: '#9e9e9e',
+    dragon: '#f44336',
+    elemental: '#00bcd4',
+    fey: '#e91e63',
+    fiend: '#673ab7',
+    giant: '#795548',
+    humanoid: '#ff9800',
+    monstrosity: '#607d8b',
+    ooze: '#8bc34a',
+    plant: '#4caf50',
+    undead: '#9e9e9e'
+  };
+  return colors[type] || '#888';
+}
+
+function getTypeName(type) {
+  const names = {
+    aberration: 'Aberración',
+    beast: 'Bestia',
+    celestial: 'Celestial',
+    construct: 'Constructo',
+    dragon: 'Dragón',
+    elemental: 'Elemental',
+    fey: 'Fey',
+    fiend: 'Infernal',
+    giant: 'Gigante',
+    humanoid: 'Humanoide',
+    monstrosity: 'Monstruosidad',
+    ooze: 'Limo',
+    plant: 'Planta',
+    undead: 'No muerto'
+  };
+  return names[type] || type;
+}
+
+function getSizeKey(size) {
+  const keys = {
+    'Diminuto': 'tiny',
+    'Pequeño': 'small',
+    'Mediano': 'medium',
+    'Grande': 'large',
+    'Enorme': 'huge',
+    'Gargantúa': 'gargantuan'
+  };
+  return keys[size] || 'medium';
+}
+
+function getEnvName(env) {
+  const names = {
+    arctic: 'Ártico',
+    coastal: 'Costero',
+    desert: 'Desierto',
+    forest: 'Bosque',
+    grassland: 'Pradera',
+    hill: 'Colina',
+    mountain: 'Montaña',
+    swamp: 'Pantano',
+    underdark: 'Underdark',
+    underwater: 'Submarino',
+    urban: 'Urbano'
+  };
+  return names[env] || env;
+}
+
+// Cerrar panel al hacer clic fuera
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('detailPanel');
+  const grid = document.getElementById('creaturesGrid');
+  if (panel.classList.contains('open') && 
+      !panel.contains(e.target) && 
+      !grid.contains(e.target)) {
+    closeDetail();
+  }
+});
+</script>
+
+</body>
+</html>

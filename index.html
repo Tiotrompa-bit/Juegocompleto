@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D 5.e - Portal Principal</title>
+    <style>
+        /* VARIABLES Y RESET */
+        :root {
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --accent-red: #c62828;
+            --accent-gold: #d4af37;
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --font-title: 'Cinzel', 'Times New Roman', serif;
+            --font-ui: Arial, Helvetica, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222222' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* CABECERA PRINCIPAL */
+        .main-header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-title {
+            font-family: var(--font-title);
+            font-size: 4rem;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(198, 40, 40, 0.5);
+            margin-bottom: 10px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .main-subtitle {
+            font-size: 1rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-top: 1px solid var(--accent-gold);
+            border-bottom: 1px solid var(--accent-gold);
+            padding: 8px 0;
+            display: inline-block;
+            animation: fadeInUp 1s ease-out 0.3s backwards;
+        }
+
+        /* GRID DE OPCIONES */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 1200px;
+            z-index: 2;
+        }
+
+        /* TARJETAS DE NAVEGACIÓN */
+        .menu-card {
+            background: var(--bg-card);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 30px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0%;
+            background: var(--accent-red);
+            transition: height 0.3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-red);
+            box-shadow: 0 10px 30px rgba(198, 40, 40, 0.2);
+        }
+
+        .menu-card:hover::before {
+            height: 100%;
+        }
+
+        /* ESTADOS DE TARJETA */
+        .card-active {
+            cursor: pointer;
+        }
+        
+        .card-coming-soon {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+        }
+        
+        .card-coming-soon:hover {
+            transform: none;
+            border-color: #444;
+            box-shadow: none;
+        }
+
+        /* CONTENIDO DE TARJETA */
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--accent-gold);
+        }
+
+        .card-title {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .card-status {
+            margin-top: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active { color: var(--accent-gold); }
+        .status-dev { color: #555; }
+        .status-new { color: #4caf50; } /* Color verde para "Nuevo" */
+
+        /* FOOTER */
+        .main-footer {
+            margin-top: 60px;
+            color: #444;
+            font-size: 0.8rem;
+            z-index: 2;
+        }
+
+        /* ANIMACIONES */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .main-title { font-size: 2.5rem; letter-spacing: 1px; }
+            .menu-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="main-header">
+        <h1 class="main-title">D&D 5.e</h1>
+        <div class="main-subtitle">Herramientas Interactivas</div>
+    </header>
+
+    <div class="menu-grid">
+        
+        <!-- OPCION 1: CREAR PERSONAJE (AHORA ACTIVO) -->
+        <a href="creador.html" class="menu-card card-active">
+            <div>
+                <div class="card-icon">📜</div>
+                <h2 class="card-title">Crear Personaje</h2>
+                <p class="card-desc">Asistente paso a paso para generar un nuevo héroe. Elige raza, clase, stats y hechizos de forma automática o manual.</p>
+            </div>
+            <!-- Cambiamos el estado a "Nuevo" y activo -->
+            <div class="card-status status-new">● Nuevo</div>
+        </a>
+
+        <!-- OPCION 2: FICHA ACTUAL -->
+        <a href="ficha.html" class="menu-card card-active">
+            <div>
+                <div class="card-icon">🛡️</div>
+                <h2 class="card-title">Ficha de Personaje</h2>
+                <p class="card-desc">Gestiona tu personaje activo, inventario, hechizos, combate y recursos durante la partida.</p>
+            </div>
+            <div class="card-status status-active">● Sistema Operativo</div>
+        </a>
+
+        <!-- OPCION 3: BESTIARIO (Placeholder) -->
+        <div class="menu-card card-coming-soon" onclick="alert('Módulo en desarrollo. Buscador de criaturas y sus estadísticas.')">
+            <div>
+                <div class="card-icon">🐉</div>
+                <h2 class="card-title">Bestiario</h2>
+                <p class="card-desc">Consulta estadísticas de monstruos, habilidades y resistencias para referencia rápida.</p>
+            </div>
+            <div class="card-status status-dev">En Desarrollo</div>
+        </div>
+
+        <!-- OPCION 4: DM (Placeholder) -->
+        <div class="menu-card card-coming-soon" onclick="alert('Módulo en desarrollo. Panel de control para el Dungeon Master.')">
+            <div>
+                <div class="card-icon">👑</div>
+                <h2 class="card-title">Portal del DM</h2>
+                <p class="card-desc">Gestión de encuentros, reglas rápidas, generadores de nombres y tesoros.</p>
+            </div>
+            <div class="card-status status-dev">En Desarrollo</div>
+        </div>
+
+    </div>
+
+    <footer class="main-footer">
+        <p>Proyecto D&D 5.e Tools v1.0</p>
+    </footer>
+
+</body>
+</html>
