@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>D&D 5.e — Herramientas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1a1a2e;
+      color: #e0d7c6;
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: #c9a84c;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(201,168,76,0.4);
+    }
+
+    header p {
+      color: #9e8f7a;
+      font-size: 0.95rem;
+      margin-top: 0.4rem;
+      letter-spacing: 1px;
+    }
+
+    .nav-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* Botones principales — ancho completo */
+    .btn-main {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      padding: 1.2rem 1.6rem;
+      background: linear-gradient(135deg, #2a2a4a, #1e1e38);
+      border: 1px solid #c9a84c55;
+      border-radius: 12px;
+      color: #e0d7c6;
+      text-decoration: none;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .btn-main:hover {
+      background: linear-gradient(135deg, #3a3a6a, #2e2e58);
+      border-color: #c9a84c;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(201,168,76,0.2);
+      color: #f5e6c0;
+    }
+
+    .btn-main .icon {
+      font-size: 1.8rem;
+      min-width: 2.2rem;
+      text-align: center;
+    }
+
+    .btn-main .info { flex: 1; }
+
+    .btn-main .info .title {
+      display: block;
+      font-size: 1.1rem;
+      color: #c9a84c;
+    }
+
+    .btn-main .info .desc {
+      display: block;
+      font-size: 0.78rem;
+      color: #9e8f7a;
+      font-weight: 400;
+      margin-top: 0.2rem;
+    }
+
+    /* Separador */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: #5a5070;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0.3rem 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #3a3050;
+    }
+
+    /* Grid 2 columnas para botones secundarios */
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .btn-secondary {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.9rem 0.8rem;
+      background: linear-gradient(135deg, #221e35, #1a1728);
+      border: 1px solid #4a4060;
+      border-radius: 10px;
+      color: #c0b49a;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, #2e2848, #221e3a);
+      border-color: #c9a84c88;
+      transform: translateY(-2px);
+      color: #e0d7c6;
+      box-shadow: 0 5px 15px rgba(201,168,76,0.15);
+    }
+
+    .btn-secondary .icon {
+      font-size: 1.5rem;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      color: #4a4060;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>⚔ D&D 5.e</h1>
+    <p>Herramientas Interactivas</p>
+  </header>
+
+  <nav class="nav-container">
+
+    <!-- BOTONES PRINCIPALES -->
+    <a href="ficha.html" class="btn-main">
+      <span class="icon">🛡️</span>
+      <span class="info">
+        <span class="title">Ficha de Personaje</span>
+        <span class="desc">Gestiona tu personaje, inventario, hechizos y combate</span>
+      </span>
+    </a>
+
+    <a href="creador.html" class="btn-main">
+      <span class="icon">📜</span>
+      <span class="info">
+        <span class="title">Crear Personaje</span>
+        <span class="desc">Asistente paso a paso para generar un nuevo héroe</span>
+      </span>
+    </a>
+
+    <a href="dm.html" class="btn-main">
+      <span class="icon">👑</span>
+      <span class="info">
+        <span class="title">Portal del DM</span>
+        <span class="desc">Encuentros, reglas rápidas, generadores y tesoros</span>
+      </span>
+    </a>
+
+    <!-- SEPARADOR -->
+    <div class="divider">Referencia</div>
+
+    <!-- BOTONES SECUNDARIOS EN GRID 2 COLUMNAS -->
+    <div class="btn-grid">
+
+      <a href="bestiario.html" class="btn-secondary">
+        <span class="icon">🐉</span>
+        <span>Bestiario</span>
+      </a>
+
+      <a href="hechizos.html" class="btn-secondary">
+        <span class="icon">✨</span>
+        <span>Grimorio</span>
+      </a>
+
+      <a href="tienda.html" class="btn-secondary">
+        <span class="icon">🏪</span>
+        <span>Tienda</span>
+      </a>
+
+      <a href="razas.html" class="btn-secondary">
+        <span class="icon">🧬</span>
+        <span>Razas</span>
+      </a>
+
+      <a href="dotes.html" class="btn-secondary">
+        <span class="icon">⚔️</span>
+        <span>Dotes</span>
+      </a>
+
+      <a href="rasgos.html" class="btn-secondary">
+        <span class="icon">🌟</span>
+        <span>Rasgos</span>
+      </a>
+
+    </div>
+
+  </nav>
+
+  <footer>Proyecto D&D 5.e Tools v1.0</footer>
+
+</body>
+</html>
