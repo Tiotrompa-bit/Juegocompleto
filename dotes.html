@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dotes — D&D 5e</title>
+<title>Rasgos — D&D 5e</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 :root{
@@ -134,7 +134,10 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Text',Georgia,s
 @media(max-width:768px){
   .layout{grid-template-columns:1fr;}
   .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);}
-  .detail-panel{width:100%;top:0;}
+  /* Corrección solicitada: top 49px para no tapar el botón de cierre */
+  .detail-panel{width:100%;top:49px;}
+  /* Optimización solicitada para navegación móvil */
+  .topbar-nav a { padding: 5px 7px; font-size: 0.62rem; }
 }
 </style>
 </head>
@@ -143,13 +146,15 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Text',Georgia,s
 <nav class="topbar">
   <a class="topbar-logo" href="index.html">⚔ D&D 5e</a>
   <div class="topbar-nav">
+    <!-- Orden actualizado y enlace activo corregido -->
     <a href="ficha.html">Ficha</a>
     <a href="creador.html">Creador</a>
     <a href="tienda.html">Tienda</a>
+    <a href="grimorio.html">Grimorio</a>
     <a href="bestiario.html">Bestiario</a>
     <a href="razas.html">Razas</a>
-    <a href="dotes.html" class="active">Dotes</a>
-    <a href="rasgos.html">Rasgos</a>
+    <a href="dotes.html">Dotes</a>
+    <a href="rasgos.html" class="active">Rasgos</a>
     <a href="dm.html">DM</a>
   </div>
 </nav>

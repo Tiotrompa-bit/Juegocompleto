@@ -134,7 +134,8 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Text',Georgia,s
 @media(max-width:768px){
   .layout{grid-template-columns:1fr;}
   .sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);}
-  .detail-panel{width:100%;top:0;}
+  .detail-panel{width:100%;top:49px;}
+  .topbar-nav a { padding: 5px 7px; font-size: 0.62rem; }
 }
 </style>
 </head>
@@ -146,6 +147,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Text',Georgia,s
     <a href="ficha.html">Ficha</a>
     <a href="creador.html">Creador</a>
     <a href="tienda.html">Tienda</a>
+    <a href="grimorio.html">Grimorio</a>
     <a href="bestiario.html">Bestiario</a>
     <a href="razas.html">Razas</a>
     <a href="dotes.html">Dotes</a>
@@ -449,7 +451,7 @@ const TRAITS = [
     icono: '📜',
     prereq: 'Ninguno',
     prereqTipo: 'none',
-    desc: 'Eliges una clase: Bardo, Brujo, Clérigo, Druida, Hechicero o Mago. Aprendes dos trucos de tu elección de la lista de esa clase.\n\nAdemás, eliges un hechizo de nivel 1 de esa misma lista. Aprendes ese hechizo y puedes lanzarlo una vez al nivel más bajo. Debes terminar un descanso largo antes de poder lanzarlo de nuevo de esta manera.\n\nTu habilidad de lanzamiento de hechizos para estos hechizos es Carisma para Bardo, Brujo o Hechicero; Sabiduría para Clérigo o Druida; o Inteligencia para Mago.',
+    desc: 'Eliges una clase: Bardo, Brujo, Clérico, Druida, Hechicero o Mago. Aprendes dos trucos de tu elección de la lista de esa clase.\n\nAdemás, eliges un hechizo de nivel 1 de esa misma lista. Aprendes ese hechizo y puedes lanzarlo una vez al nivel más bajo. Debes terminar un descanso largo antes de poder lanzarlo de nuevo de esta manera.\n\nTu habilidad de lanzamiento de hechizos para estos hechizos es Carisma para Bardo, Brujo o Hechicero; Sabiduría para Clérico o Druida; o Inteligencia para Mago.',
     beneficios: ['2 trucos', '1 hechizo nivel 1/día']
   },
   {
@@ -460,7 +462,7 @@ const TRAITS = [
     icono: '🕯️',
     prereq: 'Inteligencia o Sabiduría 13+',
     prereqTipo: 'inteligencia',
-    desc: 'Has aprendido una serie de hechizos que puedes lanzar como rituales. Estos hechizos se escriben en un libro de rituales, que debes tener en tu mano mientras lanzas uno de ellos.\n\nEliges una clase: Bardo, Brujo, Clérigo, Druida, Hechicero o Mago. Tu libro de rituales contiene dos hechizos de nivel 1 de tu elección de la lista de esa clase. También debes tener la habilidad de lanzamiento de hechizos apropiada para la clase elegida (Carisma para Bardo/Brujo/Hechicero, Sabiduría para Clérigo/Druida, Inteligencia para Mago).',
+    desc: 'Has aprendido una serie de hechizos que puedes lanzar como rituales. Estos hechizos se escriben en un libro de rituales, que debes tener en tu mano mientras lanzas uno de ellos.\n\nEliges una clase: Bardo, Brujo, Clérico, Druida, Hechicero o Mago. Tu libro de rituales contiene dos hechizos de nivel 1 de tu elección de la lista de esa clase. También debes tener la habilidad de lanzamiento de hechizos apropiada para la clase elegida (Carisma para Bardo/Brujo/Hechicero, Sabiduría para Clérico/Druida, Inteligencia para Mago).',
     beneficios: ['Libro de rituales', '2 rituales nivel 1']
   },
   {
@@ -471,7 +473,7 @@ const TRAITS = [
     icono: '🎯',
     prereq: 'Capacidad de lanzar al menos un hechizo',
     prereqTipo: 'competencia',
-    desc: 'Has aprendido técnicas para mejorar tus ataques con ciertos hechizos a distancia, obteniendo los siguientes beneficios:\n\n• Cuando lanzas un hechizo que requiere una tirada de ataque, el rango del hechizo se duplica.\n• Tus ataques con hechizos a distancia ignoran la cobertura media y completa.\n• Aprendes un truco que requiere una tirada de ataque. Elige de entre el Bardo, Brujo, Clérigo, Druida, Hechicero o Mago. Tu habilidad de lanzamiento para este truco depende de la clase elegida.',
+    desc: 'Has aprendido técnicas para mejorar tus ataques con ciertos hechizos a distancia, obteniendo los siguientes beneficios:\n\n• Cuando lanzas un hechizo que requiere una tirada de ataque, el rango del hechizo se duplica.\n• Tus ataques con hechizos a distancia ignoran la cobertura media y completa.\n• Aprendes un truco que requiere una tirada de ataque. Elige de entre el Bardo, Brujo, Clérico, Druida, Hechicero o Mago. Tu habilidad de lanzamiento para este truco depende de la clase elegida.',
     beneficios: ['Rango x2', 'Ignora cobertura', '1 truco de ataque']
   },
   {
@@ -736,7 +738,7 @@ const TRAITS = [
     icono: '🔄',
     prereq: 'Halfling',
     prereqTipo: 'raza',
-    desc: 'La fortuna te favorece cuando alguien intenta herirte. Obtienes los siguientes beneficios:\n\n• Aumenta tu puntuación de Destreza, Constitución o Carisma en 1, hasta un máximo de 20.\n• Cuando una criatura que puedes ver te impacta con una tirada de ataque, puedes usar tu reacción para forzar a esa criatura a volver a tirar. Una vez uses este rasgo, no puedes usarlo de nuevo hasta que termines un descanso corto o largo.',
+    desc: 'La fortuna te favorece cuando alguien intenta herirte. Obtienes los siguientes beneficios:\n\n• Aumenta tu puntuación de Destreza, Constitución o Carisma en 1, hasta un máximo de 20.\n• Cuando una criatura que puedes ver te impacta con una tirada de ataque, puedes usar tu reacción para forzar a esa criatura a volver a tirar. Una vez uses este rasgo, no puedes usar it de nuevo hasta que termines un descanso corto o largo.',
     beneficios: ['+1 DES/CON/CAR', 'Forzar relanzar ataque enemigo/rest']
   },
 
