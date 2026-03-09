@@ -1,0 +1,2743 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>D&D5.e - Ficha de Personaje COMPLETA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+:root{
+  --bg:#1e1e1e; --card:#2a2a2a; --gray:#555; --white:#fff;
+  --radius:6px; --trans:0.25s; --usoOn:#f44336; --accent:#c62828;
+  --exito:#4caf50; --fallo:#f44336; --ambar:#ffc107; --naranja:#ff9800; --rojo:#f44336;
+  --azul:#2196f3; --amarillo:#ffeb3b;
+  --pacto:#3f51b5; --pacto-gastado:#7986cb;
+  --druida:#4caf50; --hechicero:#9c27b0; --monje:#009688;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;color:var(--white);}
+body{background:var(--bg);padding-top:80px;padding-bottom:40px;}
+
+input,select,textarea{background:#333;border:1px solid #444;border-radius:4px;padding:4px 6px;font-size:0.95rem;color:var(--white);}
+select option { background: #333; color: var(--white); }
+button{cursor:pointer;border:none;border-radius:4px;padding:4px 8px;font-size:0.9rem;background:var(--gray);transition:background var(--trans);color:var(--white);}
+button:disabled{opacity:.6;cursor:not-allowed;}
+button:hover:not(:disabled){filter:brightness(1.2);}
+input:read-only{background:#222;border-color:#333;color:#aaa;}
+
+input.readonly-highlight, #bonifAtq, #cdSalv, #bonifComp, #ca {
+  background: #000 !important; color: #fff !important; border: 1px solid var(--accent) !important;
+  font-weight: bold; text-align: center;
+}
+
+.section{background:var(--card);border-radius:var(--radius);padding:8px;margin:6px 0;border:1px solid #333;}
+.flex{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+
+.nav{
+  display:flex; flex-wrap:wrap; position:sticky; top:0; z-index:20;
+  background:var(--bg); border-bottom:2px solid var(--accent);
+  box-shadow:0 2px 5px rgba(0,0,0,0.5);
+}
+.nav button{flex:1 1 auto; padding:.5em; border:none; border-radius:0; background:transparent; color:var(--gray); font-weight:bold; min-width:60px;}
+.nav button.active{background:var(--accent);color:var(--bg);}
+.tab{display:none;padding: 0 4px;}
+.tab.active{display:block;}
+
+.stats-row{display:flex;gap:16px;flex-wrap:wrap;}
+.stat-col{display:flex;flex-direction:column;gap:12px;flex:1;min-width:220px;}
+.stat-card{border:1px solid #555;border-radius:var(--radius);padding:6px;}
+.stat-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-weight:600;}
+.hab-buttons{display:flex;flex-direction:column;gap:2px;margin-top:4px;}
+
+.hab-row { display: flex; align-items: center; background: var(--gray); border-radius: 4px; padding: 2px; gap: 4px; }
+.hab-row button { flex: 1; text-align: left; font-size: 0.75rem; background: transparent; color: var(--white); padding: 2px 4px; }
+.hab-row button.active { background: var(--fallo); }
+.hab-row input.extra { width: 32px; font-size: 0.7rem; text-align: center; background: #222; border: 1px solid #666; color: var(--white); }
+.hab-row input.total-val { width: 32px; font-size: 0.75rem; font-weight: bold; text-align: center; background: #111; border: 1px solid var(--exito); color: var(--exito); cursor: default; padding: 0 2px; }
+
+.inv-linked{display:flex;gap:10px;margin-bottom:10px;}
+.inv-linked > div{flex:1;display:flex;flex-direction:column;gap:4px;}
+.inv-linked input{width:100%;}
+
+.velocidad-mini{display:flex;flex-direction:column;gap:4px;margin-top:8px;width:140px;}
+.velocidad-mini input{width:60px;}
+.slots-grid{display:flex;flex-direction:column;gap:4px;margin-top:8px;}
+.slot-row{display:flex;align-items:center;gap:6px;}
+.slot-row span{width:40px;text-align:right;}
+.hueco-btn{width:24px;height:24px;border:2px solid #9c27b0;background:var(--gray);}
+.hueco-btn.gastado{background:var(--usoOn);}
+.hueco-btn.bloqueado{background:#ffeb3b;}
+.states-grid{display:flex;flex-wrap:wrap;gap:4px;}
+.state-btn{padding:4px 6px;font-size:0.75em;}
+.state-btn.on{background:#dc322f;color:#fff;}
+.state-btn.off{background:var(--gray);}
+#statePanel{max-height:30vh;overflow-y:auto;background:rgba(220,50,47,.15);border:1px solid #dc322f;border-radius:var(--radius);padding:.5em;margin-top:.5em;}
+.hidden{display:none}
+.dinero-grid{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+.dinero-grid label{display:flex;align-items:center;gap:6px;font-size:0.9rem;}
+.dinero-grid input{width:100px;}
+
+.salv-btn{ width:32px; height:32px; border:3px solid var(--gray); background: transparent; border-radius: 4px; padding:0; }
+.salv-btn[data-type="exito"]{ border-color: var(--exito); }
+.salv-btn[data-type="fallo"]{ border-color: var(--fallo); }
+.salv-btn[data-state="on"][data-type="exito"]{ background: var(--exito); }
+.salv-btn[data-state="on"][data-type="fallo"]{ background: var(--fallo); }
+
+.spell-top-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+
+#btnNextTurn{width:100%;max-width:320px;margin:0 auto 12px auto;display:block;padding:10px;font-size:1.1rem;background:var(--exito);font-weight:bold;}
+.sec-extra{margin-top:12px;}
+.sec-extra h4{margin:0 0 6px 0;font-size:1rem;}
+.area-extra{width:100%;min-height:60px;resize:vertical;}
+.mini-line{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
+.mini-line label{font-size:0.9rem;display:flex;align-items:center;gap:4px;}
+
+#estadoAlerta{font-weight:bold;text-align:center;padding:6px;border-radius:4px;margin-bottom:8px;}
+.parpadeo-animado{animation: parpadeo-estado 1.5s infinite;}
+@keyframes parpadeo-estado {0% { background: var(--ambar); }50% { background: var(--naranja); }100% { background: var(--rojo); }}
+
+.hab-spec-row{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.hab-spec-row span{min-width:120px;font-size:0.85rem;}
+.hab-hueco{width:22px;height:22px;border:2px solid #4caf50;background:var(--gray);}
+.hab-hueco.gastado{background:var(--usoOn);}
+
+.btn-descanso{background:var(--exito);color:#fff;font-weight:bold;padding:8px 14px;margin-right:8px;}
+#bonifComp{width:60px; font-weight:bold; border:2px solid var(--accent); text-align:center;}
+#maestrias{width:100%;min-height:60px;resize:vertical;}
+
+#lineaVentaja{justify-content:center;gap:12px;margin-bottom:12px;}
+#btnVentaja.activo{background:var(--azul);}
+#btnDesventaja.activo{background:var(--amarillo);color:#000;}
+
+.btn-ataque-arma{background:var(--accent);color:#fff;font-weight:bold;}
+.btn-multiataque{background:var(--exito);color:#fff;font-weight:bold;}
+.btn-equipar{background:var(--exito);color:#fff;font-weight:bold;}
+.btn-desequipar{background:var(--rojo);color:#fff;font-weight:bold;}
+
+.concentracion-btn{width:40px;height:40px;border-radius:50%;background:#444;border:2px solid #666;font-size:1.2rem;transition:background 0.3s;}
+.concentracion-btn.activa{background:#ffc107;border-color:#ffeb3b;color:#000;}
+
+.btn-sumar{background:var(--exito);color:#fff;font-weight:bold;}
+.btn-restar{background:var(--rojo);color:#fff;font-weight:bold;}
+.btn-inspiracion{background:#444;color:#fff;font-weight:bold;}
+.btn-inspiracion.activo{background:#4caf50;animation:parpadeo 1s infinite;}
+@keyframes parpadeo{0%,100%{opacity:1}50%{opacity:.4}}
+.btn-iniciativa{background:var(--amarillo);color:#000;font-weight:bold;}
+.btn-vd{width:24px;height:24px;font-size:.8rem;padding:0;}
+.btn-vd.activo{background:#2196f3;color:#fff;}
+
+.action-note{width:100%;min-height:60px;resize:vertical;background:#333;border:1px solid #444;border-radius:4px;padding:4px 6px;color:var(--white);font-size:0.9rem;margin-top:4px;}
+.auto-resize {overflow-y: hidden;min-height: 40px;resize: none;}
+.hp-actual-input {font-size: 1.4rem;font-weight: bold;width: 80px;text-align: center;border: 2px solid var(--accent);background: #3a3a3a;}
+
+.spell-item, .cantrip-item { border: 1px solid #444; padding: 6px; margin-bottom: 4px; border-radius: 4px; }
+.cantrip-item { border-left: 4px solid var(--azul); }
+.spell-item { border-left: 4px solid var(--accent); }
+.btn-usar-spell { background: var(--exito); font-weight: bold; min-width: 60px; }
+
+.bonus-list-container { margin-top: 10px; }
+.bonus-item { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 6px; margin-bottom: 4px; border-radius: 4px; border-left: 3px solid var(--azul); font-size: 0.9rem;}
+.bonus-item span { flex: 1; }
+.bonus-item button { background: var(--fallo); color: #fff; margin-left: 8px; padding: 2px 6px; font-size: 0.8rem; }
+.btn-add-bonus { background: var(--azul); color: #fff; width: 100%; margin-top: 8px; font-weight: bold; }
+
+.equip-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.equip-row label { font-size: 0.85rem; }
+.equip-row select, .equip-row input { flex: 1; }
+
+.modal-overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%;background: rgba(0,0,0,0.8); z-index: 1000;display: none; align-items: center; justify-content: center;overflow-y: auto; padding: 20px;}
+.modal-content {background: var(--card); padding: 20px; border-radius: var(--radius);width: 100%; max-width: 400px; border: 2px solid var(--accent);position: relative; margin: auto;}
+.modal-content h3 { margin-bottom: 15px; text-align: center; }
+.modal-content input, .modal-content select, .modal-content textarea {width: 100%; padding: 10px; margin-bottom: 10px; font-size: 1.1rem; background: #222; border: 1px solid #555;box-sizing: border-box;}
+.modal-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+.modal-buttons button { padding: 8px 20px; font-size: 1rem; }
+.btn-modal-cancel { background: var(--gray); }
+.btn-modal-confirm { background: var(--exito); }
+
+.footer-controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.footer-controls button { flex: 1; min-width: 120px; }
+.save-status { width: 100%; text-align: center; font-size: 0.8rem; color: var(--gray); margin-top: 5px; }
+
+#importContainer { background: var(--card); padding: 10px; border: 2px dashed var(--accent); border-radius: 8px; margin-top: 10px; }
+#importContainer textarea { height: 150px; font-family: monospace; font-size: 0.8rem; }
+
+.dados-golpe-display { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.dado-hueco { width: 22px; height: 22px; border: 2px solid var(--exito); background: var(--gray); border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+.dado-hueco.gastado { background: #333; border-color: var(--gray); opacity: 0.5; }
+.dados-info { font-size: 0.85rem; color: var(--exito); margin-left: 8px; }
+
+.pacto-section { background: linear-gradient(135deg, rgba(63,81,181,0.15) 0%, rgba(63,81,181,0.05) 100%); border: 1px solid var(--pacto); border-radius: var(--radius); padding: 10px; margin-top: 10px; }
+.pacto-section h4 { color: var(--pacto-gastado); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.pacto-slots { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.pacto-hueco { width: 24px; height: 24px; border: 2px solid var(--pacto); background: var(--gray); border-radius: 4px; cursor: pointer; }
+.pacto-hueco.gastado { background: var(--pacto-gastado); border-color: var(--pacto-gastado); }
+.pacto-config { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
+
+.exhaustion-panel { background: linear-gradient(135deg, rgba(244,67,54,0.1) 0%, rgba(255,152,0,0.1) 100%); border: 1px solid var(--ambar); border-radius: var(--radius); padding: 10px; margin-top: 20px; }
+.exhaustion-panel h4 { margin-bottom: 8px; }
+.exhaustion-levels { display: flex; gap: 4px; margin-bottom: 8px; }
+.exhaustion-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--gray); background: transparent; font-weight: bold; font-size: 1rem; transition: all 0.2s; }
+.exhaustion-btn.active { background: var(--ambar); border-color: var(--naranja); color: #000; }
+.exhaustion-btn:hover:not(.active) { border-color: var(--ambar); }
+.exhaustion-btn.danger { border-color: var(--fallo); }
+.exhaustion-btn.danger.active { background: var(--fallo); border-color: var(--rojo); }
+.exhaustion-effects { font-size: 0.8rem; color: #ccc; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.exhaustion-effects.show { max-height: 300px; }
+.exhaustion-effect { padding: 4px 0; border-bottom: 1px solid #444; display: flex; gap: 8px; }
+.exhaustion-effect:last-child { border-bottom: none; }
+.exhaustion-effect .level { color: var(--ambar); min-width: 20px; }
+.exhaustion-effect .desc { color: #aaa; }
+.exhaustion-effect.active .level { color: var(--fallo); font-weight: bold; }
+.exhaustion-effect.active .desc { color: var(--white); }
+
+.class-resource-panel {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  border: 1px solid #444;
+  border-radius: var(--radius);
+  padding: 10px;
+  margin-top: 10px;
+}
+.class-resource-panel.sorcerer { border-color: var(--hechicero); }
+.class-resource-panel.monk { border-color: var(--monje); }
+
+.resource-row { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+.resource-counter { display: flex; align-items: center; gap: 4px; font-size: 1.2rem; font-weight: bold; }
+.resource-counter input { width: 40px; text-align: center; font-size: 1.1rem; background: #222; border: 1px solid #666; }
+.btn-metamagia { background: var(--hechicero); font-size: 0.85rem; padding: 4px 8px; }
+.btn-wildshape { background: var(--druida); color: #000; font-weight: bold; width: 100%; padding: 8px; margin-top: 6px; }
+.btn-wildshape.active { background: var(--fallo); color: #fff; }
+
+.inventory-weapon-item {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #222; padding: 6px 8px; border-radius: 4px; margin-bottom: 4px; border-left: 3px solid var(--gray);
+}
+.inventory-weapon-item.equipped { border-left-color: var(--exito); background: rgba(76, 175, 80, 0.1); }
+.inventory-weapon-item .weapon-name { font-weight: bold; }
+.inventory-weapon-item .weapon-details { font-size: 0.8rem; color: #aaa; margin-left: 4px; }
+.inventory-weapon-item .weapon-actions { display: flex; gap: 4px; }
+.btn-small-action { padding: 2px 6px; font-size: 0.75rem; }
+.btn-equip-inv { background: var(--azul); }
+.btn-unequip-inv { background: var(--ambar); color: #000; }
+.btn-sell-inv { background: var(--fallo); }
+
+.reloading-weap { opacity: 0.6; border-left: 3px solid var(--naranja) !important; }
+
+.calculator-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+.calc-display {
+  width: 100%;
+  background: #000;
+  border: 2px solid var(--accent);
+  color: #fff;
+  font-size: 2rem;
+  text-align: right;
+  padding: 15px;
+  border-radius: 6px;
+  font-family: 'Courier New', Courier, monospace;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+}
+.calc-btn {
+  padding: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  background: var(--gray);
+  color: #fff;
+  border: 1px solid #444;
+}
+.calc-btn:hover { filter: brightness(1.3); }
+.calc-btn.operator { background: var(--azul); }
+.calc-btn.clear { background: var(--rojo); }
+.calc-btn.equals { background: var(--exito); grid-column: span 3; }
+
+.mini-line select, .mini-line input[list] {
+  width: 180px;
+}
+datalist {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<header style="text-align:center;font-size:1.4em;margin-bottom:6px;">D&D5.e - Ficha de Personaje</header>
+<nav class="nav">
+  <button class="active" onclick="switchTab('general',event)">General</button>
+  <button onclick="switchTab('action',event)">Acción</button>
+  <button onclick="switchTab('inventory',event)">Inventario</button>
+  <button onclick="switchTab('spells',event)">Hechizos</button>
+  <button onclick="switchTab('traits',event)">Rasgos</button>
+  <button onclick="switchTab('world',event)">Mundo/Pj</button>
+  <button onclick="switchTab('calc',event)">CAL</button>
+</nav>
+
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal-content">
+    <h3 id="modalTitle">Titulo</h3>
+    <div id="modalBody"></div>
+    <div class="modal-buttons">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
+      <button id="modalConfirmBtn" class="btn-modal-confirm">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<section id="general" class="tab active">
+  <div class="section flex">
+    <input id="nombre" placeholder="Nombre" style="min-width:120px;" autocomplete="off">
+    <label>Nivel<input id="nivel" type="number" min="1" max="20" style="width:48px;" onchange="actualizarCalculos()"></label>
+    <label>CA<input id="ca" type="text" readonly style="width:48px;" title="Calculado automaticamente segun armadura y destreza"></label>
+    <label>PG Máx<input id="hpMax" type="number" min="1" style="width:60px;" onchange="guardarGeneral()"></label>
+    <label>PG Act<input id="hpAct" type="number" min="0" class="hp-actual-input" onchange="guardarGeneral()"></label>
+  </div>
+  <div class="section flex">
+    <label>PG Temp<input id="hpTemp" type="number" min="0" style="width:60px;" onchange="guardarGeneral()"></label>
+    <label>CA Temp<input id="caTemp" type="number" style="width:60px;" onchange="guardarGeneral()"></label>
+    <button class="btn-sumar" onclick="sumarHP()">Sumar PG</button>
+    <button class="btn-restar" onclick="restarHP()">Restar PG</button>
+  </div>
+
+  <div class="section"><h3>Velocidad</h3><div class="velocidad-mini">
+    <label>Pies<input id="velPies" type="number" min="0" value="30" oninput="calcVel('pies')"></label>
+    <label>Metros<input id="velMetros" type="number" min="0" step="0.5" value="9" oninput="calcVel('metros')"></label>
+    <label>Casillas<input id="velCas" type="number" min="0" value="6" oninput="calcVel('cas')"></label>
+  </div></div>
+  
+  <div class="section"><h3>Salvación contra la muerte</h3><div class="flex" style="gap:4px">
+    <button class="salv-btn" data-type="exito" data-state="off" onclick="toggleSalvacion(this)"></button>
+    <button class="salv-btn" data-type="exito" data-state="off" onclick="toggleSalvacion(this)"></button>
+    <button class="salv-btn" data-type="exito" data-state="off" onclick="toggleSalvacion(this)"></button>
+    <button class="salv-btn" data-type="fallo" data-state="off" onclick="toggleSalvacion(this)"></button>
+    <button class="salv-btn" data-type="fallo" data-state="off" onclick="toggleSalvacion(this)"></button>
+    <button class="salv-btn" data-type="fallo" data-state="off" onclick="toggleSalvacion(this)"></button>
+  </div></div>
+  
+  <div class="section"><h3>Maestría con armas y armaduras</h3><textarea id="maestrias" rows="3" placeholder="Ej. Cimitarra, armadura media, escudo..." onchange="guardarGeneral()"></textarea></div>
+
+  <div class="section flex">
+    <label>Bonif. competencia <input id="bonifComp" type="text" readonly style="width:60px;"></label>
+  </div>
+
+  <div class="section"><h3>Estadísticas</h3><div class="stats-row">
+    <div class="stat-col">
+      <div class="stat-card" data-stat="inteligencia">
+          <div class="stat-title"><span>Inteligencia</span><span><input class="mod" placeholder="mod" type="text" style="width:40px;" readonly onclick="this.select()"></span></div>
+          <label>Puntos<input class="puntos" type="number" min="0" max="20" style="width:48px;" onchange="actualizarCalculos()"></label>
+          <div class="hab-buttons">
+              <div class="hab-row"><button onclick="toggleHab(this)">Salvación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">C. Arcano</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Historia</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Investigación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Naturaleza</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Religión</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+          </div>
+      </div>
+      <div class="stat-card" data-stat="sabiduria">
+          <div class="stat-title"><span>Sabiduría</span><span><input class="mod" placeholder="mod" type="text" style="width:40px;" readonly onclick="this.select()"></span></div>
+          <label>Puntos<input class="puntos" type="number" min="0" max="20" style="width:48px;" onchange="actualizarCalculos()"></label>
+          <div class="hab-buttons">
+              <div class="hab-row"><button onclick="toggleHab(this)">Salvación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Trato Animales</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Medicina</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Percepción</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Perspicacia</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Supervivencia</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+          </div>
+      </div>
+      <div class="stat-card" data-stat="constitucion">
+          <div class="stat-title"><span>Constitución</span><span><input class="mod" placeholder="mod" type="text" style="width:40px;" readonly onclick="this.select()"></span></div>
+          <label>Puntos<input class="puntos" type="number" min="0" max="20" style="width:48px;" onchange="actualizarCalculos()"></label>
+          <div class="hab-buttons">
+              <div class="hab-row"><button onclick="toggleHab(this)">Salvación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+          </div>
+      </div>
+    </div>
+    <div class="stat-col">
+      <div class="stat-card" data-stat="fuerza">
+          <div class="stat-title"><span>Fuerza</span><span><input class="mod" placeholder="mod" type="text" style="width:40px;" readonly onclick="this.select()"></span></div>
+          <label>Puntos<input class="puntos" type="number" min="0" max="20" style="width:48px;" onchange="actualizarCalculos()"></label>
+          <div class="hab-buttons">
+              <div class="hab-row"><button onclick="toggleHab(this)">Salvación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Atletismo</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+          </div>
+      </div>
+      <div class="stat-card" data-stat="destreza">
+          <div class="stat-title"><span>Destreza</span><span><input class="mod" placeholder="mod" type="text" style="width:40px;" readonly onclick="this.select()"></span></div>
+          <label>Puntos<input class="puntos" type="number" min="0" max="20" style="width:48px;" onchange="actualizarCalculos()"></label>
+          <div class="hab-buttons">
+              <div class="hab-row"><button onclick="toggleHab(this)">Salvación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Acrobacias</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Juego Manos</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Sigilo</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+          </div>
+      </div>
+      <div class="stat-card" data-stat="carisma">
+          <div class="stat-title"><span>Carisma</span><span><input class="mod" placeholder="mod" type="text" style="width:40px;" readonly onclick="this.select()"></span></div>
+          <label>Puntos<input class="puntos" type="number" min="0" max="20" style="width:48px;" onchange="actualizarCalculos()"></label>
+          <div class="hab-buttons">
+              <div class="hab-row"><button onclick="toggleHab(this)">Salvación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Engaño</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Interpretación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Intimidación</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+              <div class="hab-row"><button onclick="toggleHab(this)">Persuasión</button><input class="extra" placeholder="+0" onchange="actualizarCalculos()" onclick="event.stopPropagation()"><input class="total-val" readonly title="Total"></div>
+          </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<section id="action" class="tab">
+  <div id="estadoAlerta" class="hidden"></div>
+  <div id="lineaVentaja" class="flex">
+    <button id="btnVentaja" onclick="toggleVentaja()">Ventaja</button>
+    <button id="btnDesventaja" onclick="toggleDesventaja()">Desventaja</button>
+  </div>
+  <div class="section"><button id="btnNextTurn" onclick="nextTurn()">Siguiente turno</button></div>
+  <div class="section flex">
+    <button id="btnMultiataque" class="btn-multiataque" onclick="usarMultiataque()">Multiataque</button>
+  </div>
+  <div class="section flex">
+    <button id="btnInspiracion" class="btn-inspiracion" onclick="toggleInspiracion()">Inspiración</button>
+    <button id="btnIniciativa" class="btn-iniciativa" onclick="tirarIniciativa()">Iniciativa</button>
+    <input id="iniciativaBonus" type="number" placeholder="+0" style="width:40px;" autocomplete="off">
+    <button id="btnVentajaIni" class="btn-vd" onclick="toggleVentajaIni()">V</button>
+    <button id="btnDesventajaIni" class="btn-vd" onclick="toggleDesventajaIni()">D</button>
+  </div>
+
+  <div class="section">
+    <h3>Notas</h3>
+    <textarea id="actionNotes" class="auto-resize" placeholder="Escribe aquí características únicas de tu personaje..." oninput="autoResize(this); guardarGeneral();"></textarea>
+  </div>
+
+  <div id="dynamicClassResources"></div>
+
+  <div class="section">
+    <h3>Habilidades especiales</h3><div id="habSpecsList"></div>
+    <button onclick="addHabEspecial()">+ Añadir habilidad</button>
+    <button onclick="delHabEspecial()">- Borrar habilidad</button>
+  </div>
+  <div class="section">
+    <h3>Acciones</h3><div class="flex" id="actionsGrid"></div>
+    <div id="actionDetail" class="hidden section"></div>
+  </div>
+  <div class="section sec-extra">
+    <h4>Acción adicional</h4>
+    <button id="btnAccAdic" onclick="usarAccAdic()">Usar acción adicional</button>
+    <textarea id="accAdic" class="action-note hidden" placeholder="Describe tu acción adicional..." onchange="guardarGeneral()"></textarea>
+  </div>
+  <div class="section sec-extra">
+    <h4>Reacción</h4>
+    <button id="btnReaccion" onclick="usarReaccion()">Usar reacción</button>
+    <textarea id="reaccion" class="action-note hidden" placeholder="Describe tu reacción..." onchange="guardarGeneral()"></textarea>
+  </div>
+  <div class="section"><h3>Estados / Condiciones</h3><div class="flex" id="statesGrid"></div><div id="statePanel" class="hidden"></div></div>
+  
+  <div class="exhaustion-panel">
+    <div class="flex" style="justify-content:space-between;align-items:center;">
+      <h4>Nivel de Agotamiento</h4>
+      <button onclick="toggleExhaustionEffects()" style="font-size:0.8rem;padding:2px 8px;">Ver efectos</button>
+    </div>
+    <div class="exhaustion-levels" id="exhaustionLevels"></div>
+    <div class="exhaustion-effects" id="exhaustionEffects"></div>
+  </div>
+</section>
+
+<section id="inventory" class="tab">
+  <div class="section">
+    <h3>Equipo y Armadura</h3>
+    <div class="equip-row">
+      <label>Tipo: 
+        <select id="armorType" onchange="actualizarCalculos()">
+          <option value="none">Sin armadura</option>
+          <option value="light">Ligera</option>
+          <option value="medium">Media</option>
+          <option value="heavy">Pesada</option>
+          <option value="natural">Armadura Natural</option>
+          <option value="unarmored_defense">Defensa sin Armadura</option>
+        </select>
+      </label>
+    </div>
+    
+    <div id="unarmoredOptions" class="unarmored-options hidden">
+      <label><input type="radio" name="unarmoredType" value="monk" onchange="actualizarCalculos()"> Monje (10 + DES + SAB)</label>
+      <label><input type="radio" name="unarmoredType" value="barbarian" onchange="actualizarCalculos()"> Bárbaro (10 + DES + CON)</label>
+    </div>
+    
+    <div class="equip-row">
+      <label>Base Arm.: <input type="number" id="armorBase" value="0" min="0" style="width:60px;" onchange="actualizarCalculos()" placeholder="Ej: 14"></label>
+      <label title="Bonus de armaduras mágicas o características">Bonus Base: <input type="number" id="armorBonus" value="0" min="0" style="width:60px;" onchange="actualizarCalculos()" placeholder="+1"></label>
+    </div>
+
+    <div class="equip-row">
+      <label>Escudo:
+        <select id="shieldEquipped" onchange="actualizarCalculos()">
+          <option value="0">No</option>
+          <option value="2">Sí (+2 CA)</option>
+        </select>
+      </label>
+    </div>
+    
+    <div style="margin-top:8px; padding:4px; background:#333; border-radius:4px; text-align:center;">
+      <span style="font-size:0.9rem;">CA Total Calculada: </span>
+      <span id="inventoryCADisplay" style="font-weight:bold; color:var(--exito); font-size:1.2rem;">10</span>
+    </div>
+
+    <div class="flex" style="margin-top:12px; gap:8px;">
+        <button class="btn-equipar" onclick="openAddWeaponModal()">Añadir/Equipar Arma</button>
+        <button class="btn-desequipar" onclick="desequiparArma()">Desequipar Arma</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Armas en el Inventario</h3>
+    <div id="inventoryWeaponsList"></div>
+    <p style="font-size:0.8rem;color:#aaa;margin-top:6px;">Las armas equipadas aparecerán en la pestaña Acción. Gestiona la munición y recargas aquí.</p>
+  </div>
+
+  <div class="section">
+    <h3>Objetos Vinculados</h3>
+    <div class="inv-linked">
+      <div><input id="invObj1" placeholder="Objeto 1" onchange="guardarGeneral()"></div>
+      <div><input id="invObj2" placeholder="Objeto 2" onchange="guardarGeneral()"></div>
+      <div><input id="invObj3" placeholder="Objeto 3" onchange="guardarGeneral()"></div>
+    </div>
+  </div>
+  <div class="section">
+    <h3>Inventario General</h3>
+    <textarea id="inventario" rows="10" style="width:100%;resize:vertical;" placeholder="Cuerdas, calderos, alimentos, botín..." onchange="guardarGeneral()"></textarea>
+  </div>
+  <div class="section">
+    <h3>Dinero</h3><div class="dinero-grid">
+      <label>Oro  <input id="oro"   type="number" min="0" value="0" onchange="guardarGeneral()"></label>
+      <label>Plata<input id="plata" type="number" min="0" value="0" onchange="guardarGeneral()"></label>
+      <label>Bronce<input id="bronce" type="number" min="0" value="0" onchange="guardarGeneral()"></label>
+    </div>
+  </div>
+</section>
+
+<section id="spells" class="tab">
+  <div class="section spell-top-row">
+    <label>Mod. habilidad lanzador
+      <select id="modHabLanz" onchange="actualizarCalculos()">
+        <option value="">--</option>
+        <option value="inteligencia">Inteligencia</option>
+        <option value="sabiduria">Sabiduría</option>
+        <option value="carisma">Carisma</option>
+      </select>
+    </label>
+    <label>CD salvación<input id="cdSalv" type="text" style="width:60px;" readonly></label>
+    <label>Bonif. ataque<input id="bonifAtq" type="text" style="width:60px;" readonly></label>
+  </div>
+  
+  <div class="section prepared-counter" id="preparedCounter">
+    <span>Preparados: <span id="preparedCount">0</span> / <span id="preparedMax">0</span></span>
+    <button class="btn-filter" id="btnFilterPrepared" onclick="toggleFilterPrepared()">Solo preparados</button>
+  </div>
+  
+  <div class="section flex" style="justify-content:center;">
+    <button id="btnConcentracion" class="concentracion-btn" onclick="toggleConcentracion()" title="Concentración">*</button>
+    <span id="txtConcentracion" style="margin-left:8px;">Sin concentración</span>
+  </div>
+  
+  <div id="pactoContainer" class="hidden">
+    <div class="section">
+      <div class="flex" style="justify-content:space-between;align-items:center;">
+        <h3>Magia de Pacto (Brujo)</h3>
+        <label style="font-size:0.85rem;"><input type="checkbox" id="pactoActivo" onchange="toggleMagiaPacto()"> Activar</label>
+      </div>
+      <div id="pactoSection" class="pacto-section hidden">
+        <div class="pacto-config">
+          <label>Slots: <input type="number" id="pactoSlots" min="1" max="4" value="2" style="width:50px;" onchange="renderMagiaPacto()"></label>
+          <label>Nivel: <select id="pactoNivel" onchange="renderMagiaPacto()">
+            <option value="1">Nivel 1</option>
+            <option value="2">Nivel 2</option>
+            <option value="3">Nivel 3</option>
+            <option value="4">Nivel 4</option>
+            <option value="5">Nivel 5</option>
+          </select></label>
+        </div>
+        <div class="pacto-slots" id="pactoSlotsDisplay"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h3>Slots por nivel</h3><div id="slotsGrid" class="slots-grid"></div>
+    <div class="flex" style="gap:6px; margin-top:6px;">
+        <button onclick="crearSlot()">Crear slot</button>
+        <button onclick="borrarSlot()">Borrar slot</button>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h3>Trucos (Nivel 0)</h3>
+    <div id="cantripsList"></div>
+    <button onclick="addCantrip()">+ Añadir Truco</button>
+  </div>
+  
+  <div class="section">
+    <h3>Hechizos (Nivel 1+)</h3>
+    <div id="spellsList"></div>
+    <button onclick="addSpell()">+ Añadir Hechizo</button>
+  </div>
+</section>
+
+<section id="traits" class="tab">
+  <div class="section">
+    <h3>Dotes</h3>
+    <div id="featsList"></div>
+    <button onclick="addFeat()">+ Añadir dote</button>
+  </div>
+  <div class="section">
+    <h3>Rasgos</h3>
+    <div id="traitsList"></div>
+    <button onclick="addTrait()">+ Añadir rasgo</button>
+  </div>
+  
+  <div class="section">
+    <h3>Bonificadores Activos</h3>
+    <p style="font-size:0.8rem;color:#aaa;margin-bottom:8px;">Añade bonos que se suman automáticamente. Si añades un bonus a una habilidad (Fuerza, etc.), se sumará a los puntos de esa habilidad.</p>
+    <div id="bonusListContainer" class="bonus-list-container"></div>
+    <button class="btn-add-bonus" onclick="abrirModalBonusSimplificado()">+ Añadir Bonificador</button>
+  </div>
+</section>
+
+<section id="world" class="tab">
+  <div class="section">
+    <div class="mini-line">
+      <label>Raza
+        <input id="raza" list="razaList" onchange="guardarGeneral()" autocomplete="off">
+        <datalist id="razaList">
+          <option value="Humano"><option value="Elfo"><option value="Enano"><option value="Mediano">
+          <option value="Dracónido"><option value="Gnomo"><option value="Semielfo"><option value="Semiorco">
+          <option value="Tiefling"><option value="Aarakocra"><option value="Genasi"><option value="Goliat">
+          <option value="Kenku"><option value="Tabaxi"><option value="Tritón"><option value="Aasimar">
+          <option value="Firbolg"><option value="Tortuga"><option value="Cambiante"><option value="Forjado">
+        </datalist>
+      </label>
+      
+      <label>Clase
+        <input id="clase" list="claseList" onchange="detectarClase()" autocomplete="off">
+        <datalist id="claseList">
+          <option value="Bárbaro"><option value="Bardo"><option value="Brujo"><option value="Clérigo">
+          <option value="Druida"><option value="Guerrero"><option value="Hechicero"><option value="Mago">
+          <option value="Monje"><option value="Paladín"><option value="Explorador"><option value="Pícaro">
+          <option value="Artificiero">
+        </datalist>
+      </label>
+      
+      <label>Subclase
+        <input id="subclase" list="subclaseList" onchange="guardarGeneral()">
+        <datalist id="subclaseList">
+        </datalist>
+      </label>
+    </div>
+    <div class="mini-line">
+      <label>Trasfondo
+        <input id="trasfondo" list="trasfondoList" onchange="guardarGeneral()">
+        <datalist id="trasfondoList">
+          <option value="Soldado"><option value="Criminal"><option value="Sabio"><option value="Acróbata">
+          <option value="Ermitaño"><option value="Noble"><option value="Héroe Popular"><option value="Forastero">
+          <option value="Artesano de Gremio"><option value="Marinero"><option value="Erudito"><option value="Granjero">
+          <option value="Acólito"><option value="Charlatán">
+        </datalist>
+      </label>
+      <label>Idiomas<input id="idiomas" onchange="guardarGeneral()"></label>
+    </div>
+    <div class="mini-line">
+      <label>Alineamiento actual<input id="alignCurrent" onchange="guardarGeneral()"></label>
+    </div>
+    <div class="mini-line">
+      <label>Dados de golpe (ej. 1d8)<input id="dadosGolpe" placeholder="1d8" onchange="guardarGeneral()"></label>
+    </div>
+    <div class="mini-line">
+      <label>Descripción física / personalidad<textarea id="descripcion" rows="2" style="width:100%;" onchange="guardarGeneral()"></textarea></label>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h3>Dados de Golpe</h3>
+    <div class="dados-golpe-display" id="dadosGolpeDisplay"></div>
+    <div class="flex" style="margin-top:8px;gap:8px;">
+      <label>Tipo: <input id="dadoGolpeTipo" placeholder="d8" style="width:50px;" onchange="guardarGeneral()"></label>
+      <button onclick="gastarDadoGolpe()" style="background:var(--exito);font-weight:bold;">Usar Dado</button>
+    </div>
+    <p style="font-size:0.75rem;color:#888;margin-top:6px;">Se recuperan la mitad (redondeando arriba) en descanso largo</p>
+  </div>
+  
+  <div class="section flex">
+    <button class="btn-descanso" onclick="descansoCorto()">Descanso corto</button>
+    <button class="btn-descanso" onclick="descansoLargo()">Descanso largo</button>
+  </div>
+  <div class="section"><h3>Relaciones NPC</h3><div id="npcList"></div><button onclick="addNpc()">+ Añadir NPC</button></div>
+  <div class="section"><h3>Notas de sesión</h3><div id="sessionNotes"></div><button onclick="addSessionNote()">+ Añadir nota</button></div>
+  <div class="section"><h3>Historia personal</h3><textarea id="backstory" rows="5" style="width:100%;" onchange="guardarGeneral()"></textarea></div>
+  <div class="section">
+    <h3>Notas</h3>
+    <textarea id="notasLibres" rows="3" style="width:100%;resize:vertical;" onfocus="this.rows=12" onblur="this.rows=3" onchange="guardarGeneral()"></textarea>
+  </div>
+</section>
+
+<section id="calc" class="tab">
+  <div class="section calculator-container">
+    <div id="calcDisplay" class="calc-display">0</div>
+    <div class="calc-grid">
+        <button class="calc-btn" onclick="calcInput('7')">7</button>
+        <button class="calc-btn" onclick="calcInput('8')">8</button>
+        <button class="calc-btn" onclick="calcInput('9')">9</button>
+        
+        <button class="calc-btn" onclick="calcInput('4')">4</button>
+        <button class="calc-btn" onclick="calcInput('5')">5</button>
+        <button class="calc-btn" onclick="calcInput('6')">6</button>
+        
+        <button class="calc-btn" onclick="calcInput('1')">1</button>
+        <button class="calc-btn" onclick="calcInput('2')">2</button>
+        <button class="calc-btn" onclick="calcInput('3')">3</button>
+        
+        <button class="calc-btn clear" onclick="calcClear()">C</button>
+        <button class="calc-btn" onclick="calcInput('0')">0</button>
+        <button class="calc-btn operator" onclick="calcInput('+')">+</button>
+        
+        <button class="calc-btn equals" onclick="calcEquals()">=</button>
+    </div>
+  </div>
+</section>
+
+<footer class="section">
+  <div class="footer-controls">
+    <button onclick="exportSheet()">Exportar / Copiar</button>
+    <button onclick="toggleImport()">Importar / Pegar</button>
+  </div>
+  <div id="saveStatus" class="save-status">Autoguardado activo</div>
+  
+  <div id="importContainer" class="hidden">
+    <h4>Pega aquí tu código JSON</h4>
+    <textarea id="importArea" placeholder="Pega aquí el texto exportado..."></textarea>
+    <div class="flex" style="margin-top:8px;">
+        <button onclick="loadImportedData()" style="background:var(--exito);flex:1;">Cargar y Reemplazar</button>
+        <button onclick="toggleImport()" style="background:var(--gray);flex:1;">Cancelar</button>
+    </div>
+  </div>
+</footer>
+
+<script src="datos_constantes.js"></script>
+<script src="datos_objetos.js"></script>
+<script src="datos_hechizos.js"></script>
+<script src="datos_razas.js"></script>
+<script src="datos_trasfondos.js"></script>
+<script src="datos_clases.js"></script>
+<script src="datos_subclases.js"></script>
+<script src="motor.js"></script>
+
+<script>
+let sheet = {};
+let slotsBloquear = false;
+let usedAction = false, usedBonus = false, usedReaction = false;
+let habSpecs = [];
+let armas = []; 
+let inventoryWeapons = []; 
+let multiataqueActivo = false;
+let ventajaActiva = false, desventajaActiva = false;
+let concentracionActiva = null;
+let inspiracionActiva = false;
+let ventajaIni = false, desventajaIni = false;
+let exhaustionLevel = 0;
+let filterPreparedActive = false;
+let magiaPacto = { activo: false, slots: 2, nivel: 1, usados: [] };
+let wildshapeActive = false;
+let subclasesList = [];
+
+function setSafeText(element, text) {
+  if (element) element.textContent = text;
+}
+
+function generateId() { return 'id_' + Math.random().toString(36).substr(2, 9); }
+
+function populateDatalists() {
+    const subclaseDatalist = document.getElementById('subclaseList');
+    if (subclaseDatalist) {
+        subclaseDatalist.innerHTML = '';
+        subclasesList = [];
+        
+        if (typeof SUBCLASES !== 'undefined') {
+            Object.values(SUBCLASES).forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub.nombre;
+                subclaseDatalist.appendChild(option);
+                subclasesList.push({ id: sub.id, nombre: sub.nombre, clase_id: sub.clase_id });
+            });
+        }
+    }
+}
+
+let modalCallback = null;
+function openModal(title, htmlContent, confirmCallback) {
+  const modalTitle = document.getElementById('modalTitle');
+  const modalBody = document.getElementById('modalBody');
+  const modalOverlay = document.getElementById('modalOverlay');
+  
+  if (modalTitle) modalTitle.textContent = title;
+  if (modalBody) modalBody.innerHTML = htmlContent;
+  modalCallback = confirmCallback;
+  
+  const inputs = modalBody ? modalBody.querySelectorAll('input, select') : [];
+  if(inputs.length > 0) setTimeout(() => inputs[0].focus(), 100);
+
+  const confirmBtn = document.getElementById('modalConfirmBtn');
+  if (confirmBtn) {
+      const newBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+      
+      newBtn.addEventListener('click', () => {
+        if (modalCallback) modalCallback();
+        closeModal();
+      });
+  }
+
+  if (modalOverlay) modalOverlay.style.display = 'flex';
+}
+function closeModal() {
+  const modalOverlay = document.getElementById('modalOverlay');
+  if (modalOverlay) modalOverlay.style.display = 'none';
+  modalCallback = null;
+}
+
+const states=[
+  {id:"blinded", name:"Cegado", desc:"Fallas automáticamente cualquier prueba que requiera vista."},
+  {id:"charmed", name:"Encantado", desc:"No puedes atacar a quien te encantó."},
+  {id:"deafened", name:"Sordo", desc:"Fallas automáticamente cualquier prueba que requiera oír."},
+  {id:"frightened", name:"Asustado", desc:"Tienes desventaja en tiradas de ataque y pruebas de habilidad."},
+  {id:"grappled", name:"Agarrado", desc:"Tu velocidad se convierte en 0."},
+  {id:"incapacitated", name:"Incapacitado", desc:"No puedes realizar acciones ni reacciones."},
+  {id:"invisible", name:"Invisible", desc:"Los ataques contra ti tienen desventaja."},
+  {id:"paralyzed", name:"Paralizado", desc:"Estás incapacitado."},
+  {id:"petrified", name:"Petrificado", desc:"Estás paralizado y tienes resistencia a todo daño."},
+  {id:"poisoned", name:"Envenenado", desc:"Tienes desventaja en tiradas de ataque."},
+  {id:"prone", name:"Tirado", desc:"Tu único movimiento es arrastrarte."},
+  {id:"restrained", name:"Restringido", desc:"Tu velocidad se convierte en 0."},
+  {id:"stunned", name:"Aturdido", desc:"Estás incapacitado."},
+  {id:"unconscious", name:"Inconsciente", desc:"Estás incapacitado."}
+];
+const actions=[
+  {id:"cast", name:"Lanzar hechizo", desc:"Muestra la tirada de ataque y cambia a la pestaña de hechizos.", goto:"spells"},
+  {id:"dash", name:"Correr", desc:"Duplicas tu velocidad."},
+  {id:"disengage", name:"Desengancharse", desc:"Tu movimiento no provoca ataques de oportunidad."},
+  {id:"dodge", name:"Esquivar", desc:"Los ataques contra ti tienen desventaja."},
+  {id:"help", name:"Ayudar", desc:"Das ventaja a un aliado."},
+  {id:"hide", name:"Esconderse", desc:"Intentar ocultarte."},
+  {id:"search", name:"Buscar", desc:"Investigar el área."},
+  {id:"use", name:"Usar objeto", desc:"Interactuar con un objeto.", goto:"inventory"},
+  {id:"ready", name:"Prepararse", desc:"Preparas una acción."},
+  {id:"grapple", name:"Agarrar", desc:"Intentas agarrar a una criatura."},
+  {id:"shove", name:"Derribar", desc:"Intentas derribar a una criatura."}
+];
+const maestrias=[
+  {id:'cleave', nombre:'Hendidura', desc:'Si aciertas, puedes hacer otro ataque a otra criatura cercana.'},
+  {id:'nick', nombre:'Muesca', desc:'Puedes hacer un segundo ataque con un arma ligera.'},
+  {id:'push', nombre:'Empujón', desc:'Si golpeas, puedes empujar a la criatura 10 pies hacia atrás.'},
+  {id:'sap', nombre:'Debilitar', desc:'La criatura tiene desventaja en su próximo ataque.'},
+  {id:'slow', nombre:'Ralentizar', desc:'Reduces la velocidad de la criatura.'},
+  {id:'topple', nombre:'Derribo', desc:'La criatura debe hacer una salvación de Constitución o caer.'},
+  {id:'graze', nombre:'Rasguño', desc:'Si fallas, haces daño igual a tu modificador de habilidad.'},
+  {id:'vex', nombre:'Vejar', desc:'Ganas ventaja en tu próximo ataque contra esa criatura.'},
+  {id:'flex', nombre:'Flexibilidad', desc:'Puedes usar el daño de dos manos de un arma versátil con una mano.'},
+  {id:'none', nombre:'Ninguna', desc:'Sin maestría.'}
+];
+
+const exhaustionEffects = [
+  { level: 1, desc: "Desventaja en pruebas de habilidad" },
+  { level: 2, desc: "Velocidad reducida a la mitad" },
+  { level: 3, desc: "Desventaja en ataques y salvaciones" },
+  { level: 4, desc: "PG máximo reducido a la mitad" },
+  { level: 5, desc: "Velocidad reducida a 0" },
+  { level: 6, desc: "MUERTE" }
+];
+
+function switchTab(id, ev){
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const targetTab = document.getElementById(id);
+  if(targetTab) targetTab.classList.add('active');
+  
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if(ev && ev.target) {
+     ev.target.closest('button').classList.add('active');
+  }
+  actualizarAlertaEstado();
+  guardarGeneral();
+  
+  if(id === 'action') renderActions();
+  if(id === 'inventory') renderInventoryWeapons();
+}
+
+function detectarClase(){
+  const claseInput = document.getElementById('clase').value.toLowerCase().trim();
+  const pactoContainer = document.getElementById('pactoContainer');
+  
+  if(claseInput === 'brujo' || claseInput === 'warlock') {
+      if(pactoContainer) pactoContainer.classList.remove('hidden');
+  } else {
+      if(pactoContainer) pactoContainer.classList.add('hidden');
+  }
+  
+  guardarGeneral();
+  renderDynamicResources();
+}
+
+function renderDynamicResources() {
+  const container = document.getElementById('dynamicClassResources');
+  const clase = document.getElementById('clase').value.toLowerCase().trim();
+  if (container) container.innerHTML = ''; 
+  
+  if(clase === 'druida' || clase === 'druid') {
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.innerHTML = `
+      <div class="flex" style="justify-content:space-between;align-items:center;">
+        <h3>Forma Salvaje</h3>
+        <span style="font-size:0.8rem;color:var(--druida);">Recurso de Clase</span>
+      </div>
+      <p style="font-size:0.8rem;color:#aaa;">Transformación en bestia (CA y PG temporales).</p>
+      <button id="btnWildshape" class="btn-wildshape ${wildshapeActive ? 'active' : ''}" onclick="toggleWildshape()">
+        ${wildshapeActive ? 'Revertir Forma' : 'Activar Forma Salvaje'}
+      </button>
+    `;
+    container.appendChild(div);
+  }
+  
+  if(clase === 'hechicero' || clase === 'sorcerer') {
+    if(!sheet.sorceryPoints) sheet.sorceryPoints = { current: 0, max: 0 };
+    const nivel = parseInt(document.getElementById('nivel').value) || 1;
+    sheet.sorceryPoints.max = nivel;
+    if(sheet.sorceryPoints.current === 0 && nivel > 0) sheet.sorceryPoints.current = nivel;
+
+    const div = document.createElement('div');
+    div.className = 'section class-resource-panel sorcerer';
+    div.innerHTML = `
+      <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3>Puntos de Hechicero</h3>
+        <div class="resource-counter">
+          <input type="number" min="0" value="${sheet.sorceryPoints.current}" onchange="updateSorceryPoints(this.value)"> / ${sheet.sorceryPoints.max}
+        </div>
+      </div>
+      <div class="flex" style="gap:6px;">
+        <button class="btn-metamagia" onclick="usarMetamagia('duplicar')">Duplicar Hechizo</button>
+        <button class="btn-metamagia" onclick="usarMetamagia('conversion')">Conversión</button>
+      </div>
+    `;
+    container.appendChild(div);
+  }
+  
+  if(clase === 'monje' || clase === 'monk') {
+    if(!sheet.ki) sheet.ki = 0;
+    const nivel = parseInt(document.getElementById('nivel').value) || 1;
+    
+    const div = document.createElement('div');
+    div.className = 'section class-resource-panel monk';
+    div.innerHTML = `
+      <div class="flex" style="justify-content:space-between;align-items:center;">
+        <h3>Puntos de Ki</h3>
+        <div class="resource-counter">
+          <input type="number" min="0" value="${sheet.ki}" onchange="updateKi(this.value)"> / ${nivel}
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  }
+}
+
+function toggleWildshape() {
+  if(wildshapeActive) {
+    document.getElementById('caTemp').value = '';
+    document.getElementById('hpTemp').value = '';
+    wildshapeActive = false;
+    alert("Has vuelto a tu forma natural.");
+  } else {
+    const modDes = getMod('destreza');
+    const modSab = getMod('sabiduria');
+    const caSugerida = 13 + modDes + modSab; 
+    
+    openModal("Forma Salvaje", `
+      <p>Introduce los datos de la bestia:</p>
+      <label>CA de la bestia (Sugerido: ${caSugerida}): <input type="number" id="wsCA" value="${caSugerida}" autofocus></label>
+      <label>PG de la bestia: <input type="number" id="wsHP" placeholder="Ej: 20"></label>
+    `, () => {
+      const ca = document.getElementById('wsCA').value;
+      const hp = document.getElementById('wsHP').value;
+      
+      if(ca) document.getElementById('caTemp').value = ca;
+      if(hp) document.getElementById('hpTemp').value = hp;
+      
+      wildshapeActive = true;
+      alert(`¡Te transformas! CA Temp: ${ca}, PG Temp: ${hp}.`);
+      renderDynamicResources();
+      guardarGeneral();
+    });
+  }
+  renderDynamicResources();
+  guardarGeneral();
+}
+
+function updateSorceryPoints(val) { if (sheet.sorceryPoints) sheet.sorceryPoints.current = parseInt(val) || 0; guardarGeneral(); }
+
+function usarMetamagia(tipo) {
+  if(tipo === 'duplicar') {
+    const cost = prompt("¿Nivel del hechizo a duplicar? (Coste: 1 punto por nivel)");
+    if(cost && !isNaN(cost)) {
+       const totalCost = parseInt(cost);
+       if(sheet.sorceryPoints && sheet.sorceryPoints.current >= totalCost) {
+         sheet.sorceryPoints.current -= totalCost;
+         alert(`Hechizo DUPLICADO. Puntos restantes: ${sheet.sorceryPoints.current}`);
+       } else { alert("No tienes suficientes puntos."); }
+    }
+  } else if (tipo === 'conversion') {
+    openModal("Conversión de Puntos", `
+      <p>Convertir Puntos en Ranuras (o viceversa).</p>
+      <button onclick="crearSlotHechicero()" style="background:var(--hechicero);width:100%;margin-bottom:10px;">Crear Slot Nivel 1 (2 Puntos)</button>
+      <button onclick="convertirSlotAPuntos()" style="background:var(--gray);width:100%;">Convertir Slot Nivel 1 en 1 Punto</button>
+    `, () => { renderDynamicResources(); });
+  }
+  guardarGeneral();
+  renderDynamicResources();
+}
+
+function updateKi(val) { sheet.ki = parseInt(val) || 0; guardarGeneral(); }
+
+function calcularModificador(puntos) {
+  const score = parseInt(puntos) || 10;
+  return Math.floor((Math.min(score, 20) - 10) / 2);
+}
+
+function calcularBonificadorCompetencia(nivel) {
+  const lvl = parseInt(nivel) || 1;
+  if(lvl >= 17) return 6;
+  if(lvl >= 13) return 5;
+  if(lvl >= 9) return 4;
+  if(lvl >= 5) return 3;
+  return 2;
+}
+
+function getActiveBonus(type, name) {
+    if (!sheet.bonificadores) return 0;
+    return sheet.bonificadores
+        .filter(b => b.tipo === type && b.nombre.toLowerCase() === name.toLowerCase())
+        .reduce((sum, b) => sum + parseInt(b.valor), 0);
+}
+
+function actualizarCalculos() {
+  const nivel = document.getElementById('nivel').value;
+  const bc = calcularBonificadorCompetencia(nivel);
+  document.getElementById('bonifComp').value = (bc >= 0 ? "+" : "") + bc;
+
+  const armorType = document.getElementById('armorType').value;
+  const armorBase = parseInt(document.getElementById('armorBase').value) || 0;
+  const armorBonus = parseInt(document.getElementById('armorBonus').value) || 0;
+  let shieldBonus = parseInt(document.getElementById('shieldEquipped').value) || 0;
+  
+  let modDestreza = getMod('destreza');
+  let caTotal = 10;
+  
+  const tieneDosManos = inventoryWeapons.some(w => w.equipped && w.props?.dosManos);
+  if(tieneDosManos && shieldBonus > 0) {
+    document.getElementById('shieldEquipped').value = '0';
+    shieldBonus = 0;
+  }
+  
+  if(armorType === 'none' || armorType === 'natural' || armorType === '') {
+      caTotal = 10 + modDestreza + armorBase + armorBonus;
+  } 
+  else if (armorType === 'unarmored_defense') {
+      const unarmoredType = document.querySelector('input[name="unarmoredType"]:checked')?.value;
+      document.getElementById('unarmoredOptions').classList.remove('hidden');
+      
+      let modSecundario = 0;
+      if(unarmoredType === 'monk') modSecundario = getMod('sabiduria');
+      else if(unarmoredType === 'barbarian') modSecundario = getMod('constitucion');
+      caTotal = 10 + modDestreza + modSecundario + armorBonus;
+  }
+  else if (armorType === 'light') {
+      document.getElementById('unarmoredOptions').classList.add('hidden');
+      caTotal = armorBase + modDestreza + armorBonus;
+  }
+  else if (armorType === 'medium') {
+      document.getElementById('unarmoredOptions').classList.add('hidden');
+      const desLimite = Math.min(modDestreza, 2);
+      caTotal = armorBase + desLimite + armorBonus;
+  }
+  else if (armorType === 'heavy') {
+      document.getElementById('unarmoredOptions').classList.add('hidden');
+      caTotal = armorBase + armorBonus;
+  }
+  else {
+      document.getElementById('unarmoredOptions').classList.add('hidden');
+  }
+
+  const caBonusActivos = getActiveBonus('ca', 'ca');
+  const shieldActual = tieneDosManos ? 0 : shieldBonus;
+  caTotal += shieldActual + caBonusActivos;
+
+  const caInput = document.getElementById('ca');
+  caInput.value = caTotal;
+  const invCaDisplay = document.getElementById('inventoryCADisplay');
+  if(invCaDisplay) invCaDisplay.textContent = caTotal;
+
+  document.querySelectorAll('.stat-card').forEach(card => {
+    const puntosInput = card.querySelector('.puntos');
+    const modInput = card.querySelector('.mod');
+    const statName = card.dataset.stat;
+    
+    let puntosVal = parseInt(puntosInput.value) || 10;
+    
+    const bonusHabilidad = getActiveBonus('habilidad', statName);
+    const totalPuntosEfectivos = Math.min(puntosVal + bonusHabilidad, 20);
+    
+    const mod = calcularModificador(totalPuntosEfectivos);
+    modInput.value = (mod >= 0 ? "+" : "") + mod;
+    
+    card.querySelectorAll('.hab-row').forEach(row => {
+        const btn = row.querySelector('button');
+        const extraInput = row.querySelector('.extra');
+        const totalInput = row.querySelector('.total-val');
+        
+        const extra = parseInt(extraInput.value) || 0;
+        const isActive = btn.classList.contains('active');
+        
+        let total = mod + extra;
+        if(isActive) total += bc;
+        
+        totalInput.value = (total >= 0 ? "+" : "") + total;
+    });
+  });
+
+  rellenaSpellDC();
+  actualizarContadorPreparados();
+  renderArmas();
+  renderDynamicResources(); 
+  guardarGeneral();
+}
+
+function getMod(stat){
+  const card=document.querySelector(`.stat-card[data-stat="${stat}"]`);
+  let val = card?.querySelector('.mod')?.value || "0";
+  return parseInt(val) || 0;
+}
+function getBonifComp(){ return parseInt(document.getElementById('bonifComp').value)||0; }
+
+function rellenaSpellDC(){
+  const statSelect=document.getElementById('modHabLanz');
+  const stat=statSelect.value;
+  const cdInput=document.getElementById('cdSalv');
+  const atqInput=document.getElementById('bonifAtq');
+  
+  if(!stat){ cdInput.value='--'; atqInput.value='--'; return; }
+  
+  const mod=getMod(stat);
+  const bc=getBonifComp();
+  
+  cdInput.value=8+bc+mod;
+  atqInput.value=(bc+mod >= 0 ? "+" : "") + (bc+mod);
+  guardarGeneral();
+}
+
+function calcVel(origen){
+  const pies=document.getElementById('velPies'), metros=document.getElementById('velMetros'), cas=document.getElementById('velCas');
+  let p, m, c;
+  
+  if(origen==='pies'){ p = parseInt(pies.value, 10) || 0; m = p * 0.3; c = Math.floor(p / 5); metros.value = m.toFixed(1); cas.value = c; }
+  else if(origen==='metros'){ m = parseFloat(metros.value) || 0; p = Math.round(m / 0.3); c = Math.floor(m / 1.5); pies.value = p; cas.value = c; }
+  else if(origen==='cas'){ c = parseInt(cas.value, 10) || 0; p = c * 5; m = c * 1.5; pies.value = p; metros.value = m.toFixed(1); }
+  guardarGeneral();
+}
+
+function autoResize(el){ 
+  if (el) {
+    el.style.height = 'auto'; 
+    el.style.height = el.scrollHeight + 'px'; 
+  }
+}
+
+function sumarHP(){
+  openModal("Sumar PG", `<input type="number" id="modalInput" placeholder="Cantidad" autofocus>`, () => {
+    const val = parseInt(document.getElementById('modalInput').value) || 0;
+    if(val <= 0) return;
+    const actEl = document.getElementById('hpAct');
+    const max = parseInt(document.getElementById('hpMax').value) || 0;
+    actEl.value = Math.min((parseInt(actEl.value)||0)+val, max);
+    guardarGeneral();
+  });
+}
+
+function restarHP(){
+  const caActual = document.getElementById('ca').value;
+  openModal("Restar PG", `
+    <label>¿El enemigo superó tu CA (${caActual})?</label>
+    <select id="modalSelect">
+      <option value="no">No (Fallo)</option>
+      <option value="si">Sí (Acierto)</option>
+    </select>
+    <br><br>
+    <input type="number" id="modalInput" placeholder="Daño total" autofocus>
+  `, () => {
+    const supero = document.getElementById('modalSelect').value === 'si';
+    let val = parseInt(document.getElementById('modalInput').value) || 0;
+    
+    if(!supero && val > 0) { if(!confirm("El ataque falló. ¿Seguro que quieres aplicar daño?")) return; }
+
+    if(val > 0){
+      const tempEl = document.getElementById('hpTemp');
+      let temp = parseInt(tempEl.value)||0;
+      let act = parseInt(document.getElementById('hpAct').value)||0;
+      
+      if(temp > 0){ if(temp >= val){ tempEl.value = temp - val; val = 0; } else{ val -= temp; tempEl.value = 0; } }
+      if(val > 0) document.getElementById('hpAct').value = Math.max(act - val, 0);
+      
+      if(concentracionActiva) { setTimeout(() => verificarConcentracionPorDano(val), 100); }
+    }
+    guardarGeneral();
+  });
+}
+
+function verificarConcentracionPorDano(danoRecibido) {
+    const cd = Math.max(10, Math.floor(danoRecibido / 2));
+    openModal("Salvación de Concentración", 
+        `<p>Has recibido <strong>${danoRecibido}</strong> puntos de daño. CD: ${cd}.</p>
+         <label>Resultado tirada CON:</label>
+         <input type="number" id="saveConcResult" placeholder="Ej. 15" autofocus>`, 
+    () => {
+        const resultado = parseInt(document.getElementById('saveConcResult').value) || 0;
+        if(resultado >= cd) alert("¡ÉXITO! Mantienes la concentración.");
+        else {
+            alert(`FALLO. Pierdes la concentración en "${concentracionActiva.nombre}".`);
+            concentracionActiva = null;
+            actualizarUIConcentracion();
+            guardarGeneral();
+        }
+    });
+}
+
+function toggleVentaja(){ventajaActiva=!ventajaActiva;desventajaActiva=false;actualizarBotonesVD();guardarGeneral();}
+function toggleDesventaja(){desventajaActiva=!desventajaActiva;ventajaActiva=false;actualizarBotonesVD();guardarGeneral();}
+function actualizarBotonesVD(){
+  const bV=document.getElementById('btnVentaja'), bD=document.getElementById('btnDesventaja');
+  if (bV) bV.classList.toggle('activo',ventajaActiva);
+  if (bD) bD.classList.toggle('activo',desventajaActiva);
+}
+
+function toggleConcentracion(){
+  if(!concentracionActiva){alert("No estás concentrado. Lanza un hechizo con concentración.");return;}
+  openModal("Terminar concentración", `¿Terminar concentración en "${concentracionActiva.nombre}"?`, () => {
+      concentracionActiva=null;actualizarUIConcentracion();guardarGeneral();
+  });
+}
+function actualizarUIConcentracion(){
+  const btn=document.getElementById('btnConcentracion');
+  const txt=document.getElementById('txtConcentracion');
+  if(concentracionActiva){
+    if (btn) btn.classList.add('activa');
+    if (txt) txt.textContent=`Concentrado: ${concentracionActiva.nombre}`;
+  } else {
+    if (btn) btn.classList.remove('activa');
+    if (txt) txt.textContent='Sin concentración';
+  }
+}
+
+function initSlots(){
+  const div=document.getElementById('slotsGrid'), levels=[4,3,3,3,2,2,1,1,1];
+  if (div) {
+    div.innerHTML = '';
+    levels.forEach((cant,n)=>{
+      const lvl=n+1, row=document.createElement('div');row.className='slot-row';
+      row.innerHTML=`<span>N${lvl}</span>`;
+      for(let i=0;i<cant;i++){
+        const b=document.createElement('button');b.className='hueco-btn';
+        b.dataset.gastado='false'; b.dataset.nivel = lvl;
+        b.onclick=()=>toggleSlot(b);
+        row.appendChild(b);
+      }
+      div.appendChild(row);
+    });
+  }
+}
+function toggleSlot(btn){
+  btn.dataset.gastado=btn.dataset.gastado==='true'?'false':'true';
+  btn.classList.toggle('gastado', btn.dataset.gastado==='true');
+  btn.style.background=btn.dataset.gastado==='true'?'var(--usoOn)':'var(--gray)';
+  guardarGeneral();
+}
+
+function crearSlot(){
+   openModal("Crear Slot de Hechizo", `
+      <label>Selecciona el nivel del slot a crear:</label>
+      <select id="slotLevelSelect" style="width:100%;">
+          ${[1,2,3,4,5,6,7,8,9].map(l => `<option value="${l}">Nivel ${l}</option>`).join('')}
+      </select>
+   `, () => {
+      const nivel = parseInt(document.getElementById('slotLevelSelect').value);
+      const grid = document.getElementById('slotsGrid');
+      if (grid) {
+        let row = [...grid.querySelectorAll('.slot-row')].find(r => r.querySelector('span').textContent === 'N'+nivel);
+        
+        if(row) {
+            const btn = document.createElement('button');
+            btn.className='hueco-btn';
+            btn.dataset.gastado='false';
+            btn.dataset.nivel = nivel;
+            btn.onclick=function(){ toggleSlot(this); };
+            row.appendChild(btn);
+        } else {
+            const newRow = document.createElement('div');
+            newRow.className='slot-row';
+            newRow.innerHTML = `<span>N${nivel}</span>`;
+            const btn = document.createElement('button');
+            btn.className='hueco-btn';
+            btn.dataset.gastado='false';
+            btn.dataset.nivel = nivel;
+            btn.onclick=function(){ toggleSlot(this); };
+            newRow.appendChild(btn);
+            grid.appendChild(newRow);
+        }
+        guardarGeneral();
+        alert(`Slot de Nivel ${nivel} creado.`);
+      }
+   });
+}
+
+function borrarSlot(){
+   openModal("Borrar Slot de Hechizo", `
+      <label>Selecciona el nivel del slot a borrar:</label>
+      <select id="slotLevelSelect" style="width:100%;">
+          ${[1,2,3,4,5,6,7,8,9].map(l => `<option value="${l}">Nivel ${l}</option>`).join('')}
+      </select>
+   `, () => {
+      const nivel = parseInt(document.getElementById('slotLevelSelect').value);
+      const grid = document.getElementById('slotsGrid');
+      if (grid) {
+        const row = [...grid.querySelectorAll('.slot-row')].find(r => r.querySelector('span').textContent === 'N'+nivel);
+        
+        if(row && row.querySelectorAll('.hueco-btn').length > 0) {
+            const lastBtn = row.querySelector('.hueco-btn:last-of-type');
+            if(lastBtn) lastBtn.remove();
+            guardarGeneral();
+            alert(`Slot de Nivel ${nivel} eliminado.`);
+        } else {
+            alert(`No hay slots de Nivel ${nivel} para borrar.`);
+        }
+      }
+   });
+}
+
+function toggleMagiaPacto() {
+  const pactoActivoCheck = document.getElementById('pactoActivo');
+  const pactoSection = document.getElementById('pactoSection');
+  
+  if (pactoActivoCheck) magiaPacto.activo = pactoActivoCheck.checked;
+  if (pactoSection) pactoSection.classList.toggle('hidden', !magiaPacto.activo);
+  if(magiaPacto.activo) renderMagiaPacto();
+  guardarGeneral();
+}
+
+function renderMagiaPacto() {
+  if(!magiaPacto.activo) return;
+  const pactoSlotsInput = document.getElementById('pactoSlots');
+  const pactoNivelSelect = document.getElementById('pactoNivel');
+  const pactoSlotsDisplay = document.getElementById('pactoSlotsDisplay');
+  
+  if (pactoSlotsInput) magiaPacto.slots = parseInt(pactoSlotsInput.value) || 2;
+  if (pactoNivelSelect) magiaPacto.nivel = parseInt(pactoNivelSelect.value) || 1;
+  if(!magiaPacto.usados || magiaPacto.usados.length !== magiaPacto.slots) magiaPacto.usados = Array(magiaPacto.slots).fill(false);
+  
+  if (pactoSlotsDisplay) {
+    pactoSlotsDisplay.innerHTML = '';
+    for(let i = 0; i < magiaPacto.slots; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'pacto-hueco' + (magiaPacto.usados[i] ? ' gastado' : '');
+      btn.textContent = i + 1;
+      btn.onclick = () => togglePactoSlot(i);
+      pactoSlotsDisplay.appendChild(btn);
+    }
+  }
+  guardarGeneral();
+}
+
+function togglePactoSlot(index) { magiaPacto.usados[index] = !magiaPacto.usados[index]; renderMagiaPacto(); }
+function recuperarMagiaPacto() { if(magiaPacto.activo && magiaPacto.usados) { magiaPacto.usados.fill(false); renderMagiaPacto(); } }
+
+function renderDadosGolpe() {
+  const nivel = parseInt(document.getElementById('nivel').value) || 1;
+  const container = document.getElementById('dadosGolpeDisplay');
+  if(!sheet.dadosGolpeUsados) sheet.dadosGolpeUsados = [];
+  while(sheet.dadosGolpeUsados.length < nivel) sheet.dadosGolpeUsados.push(false);
+  sheet.dadosGolpeUsados = sheet.dadosGolpeUsados.slice(0, nivel);
+  
+  if (container) {
+    container.innerHTML = '';
+    for(let i = 0; i < nivel; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'dado-hueco' + (sheet.dadosGolpeUsados[i] ? ' gastado' : '');
+      btn.onclick = () => toggleDadoGolpe(i);
+      container.appendChild(btn);
+    }
+    const disponibles = sheet.dadosGolpeUsados.filter(d => !d).length;
+    const info = document.createElement('span');
+    info.className = 'dados-info';
+    info.textContent = `Dados: ${disponibles}/${nivel} disponibles`;
+    container.appendChild(info);
+  }
+  guardarGeneral();
+}
+
+function toggleDadoGolpe(index) { sheet.dadosGolpeUsados[index] = !sheet.dadosGolpeUsados[index]; renderDadosGolpe(); }
+
+function gastarDadoGolpe() {
+  if(!sheet.dadosGolpeUsados) sheet.dadosGolpeUsados = [];
+  const nivel = parseInt(document.getElementById('nivel').value) || 1;
+  while(sheet.dadosGolpeUsados.length < nivel) sheet.dadosGolpeUsados.push(false);
+  
+  const index = sheet.dadosGolpeUsados.findIndex(d => !d);
+  if(index === -1) { alert("No tienes dados de golpe disponibles."); return; }
+  
+  const tipoDado = document.getElementById('dadoGolpeTipo').value || 'd8';
+  openModal("Usar Dado de Golpe", 
+    `<p>Gastar un dado de golpe (${tipoDado}).</p><label>Resultado de la tirada:</label><input type="number" id="resultadoDado" placeholder="Ej: 5" autofocus>`, 
+  () => {
+    const resultado = parseInt(document.getElementById('resultadoDado').value) || 0;
+    const modCon = getMod('constitucion');
+    const total = Math.max(resultado + modCon, 1);
+    const hpAct = parseInt(document.getElementById('hpAct').value) || 0;
+    const hpMax = parseInt(document.getElementById('hpMax').value) || 0;
+    document.getElementById('hpAct').value = Math.min(hpAct + total, hpMax);
+    sheet.dadosGolpeUsados[index] = true;
+    renderDadosGolpe();
+    guardarGeneral();
+    alert(`Recuperas ${total} puntos de vida.`);
+  });
+}
+
+function renderExhaustion() {
+  const container = document.getElementById('exhaustionLevels');
+  if (container) {
+    container.innerHTML = '';
+    for(let i = 0; i <= 6; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'exhaustion-btn' + (i === exhaustionLevel ? ' active' : '');
+      if(i >= 4) btn.classList.add('danger');
+      btn.textContent = i;
+      btn.onclick = () => setExhaustionLevel(i);
+      container.appendChild(btn);
+    }
+  }
+  renderExhaustionEffects();
+  aplicarEfectosExhaustion();
+  actualizarAlertaEstado(); 
+  guardarGeneral();
+}
+
+function setExhaustionLevel(level) {
+  if(level === 6) { if(!confirm("Nivel 6 de agotamiento significa MUERTE. ¿Estás seguro?")) return; alert("Tu personaje ha muerto por agotamiento extremo."); }
+  exhaustionLevel = level;
+  renderExhaustion();
+}
+
+function toggleExhaustionEffects() { 
+  const effects = document.getElementById('exhaustionEffects');
+  if (effects) effects.classList.toggle('show'); 
+}
+
+function renderExhaustionEffects() {
+  const container = document.getElementById('exhaustionEffects');
+  if (container) {
+    container.innerHTML = '';
+    exhaustionEffects.forEach(eff => {
+      const div = document.createElement('div');
+      div.className = 'exhaustion-effect' + (eff.level <= exhaustionLevel ? ' active' : '');
+      div.innerHTML = `<span class="level">${eff.level}.</span><span class="desc">${eff.desc}</span>`;
+      container.appendChild(div);
+    });
+  }
+}
+
+function aplicarEfectosExhaustion() {
+  if(exhaustionLevel >= 4) {
+    const hpMax = parseInt(document.getElementById('hpMax').value) || 0;
+    const hpAct = parseInt(document.getElementById('hpAct').value) || 0;
+    const nuevoMax = Math.floor(hpMax / 2);
+    if(hpAct > nuevoMax) document.getElementById('hpAct').value = nuevoMax;
+  }
+}
+
+function openAddWeaponModal() {
+     openModal("Añadir Arma al Inventario", 
+    `<input id="wName" placeholder="Nombre del arma" autofocus>
+     <input id="wDmg" placeholder="Daño (ej. 1d8)">
+     <input type="number" id="wBonus" placeholder="Bonus mágico (+1, +2...)" value="0">
+     <label>Stat asociado:<select id="wStat" style="width:100%"><option value="fuerza">Fuerza</option><option value="destreza">Destreza</option></select></label>
+     <label>Maestría:<select id="wMastery" style="width:100%;margin-top:5px;">${maestrias.map((m,i)=>`<option value="${i}">${m.nombre}</option>`).join('')}</select></label>
+     <div style="margin-top:10px; border-top:1px solid #444; padding-top:8px;">
+       <label class="weapon-prop"><input type="checkbox" id="wDosManos"> Dos manos (Impide escudo)</label>
+       <label class="weapon-prop"><input type="checkbox" id="wSutil"> Sutil (FUE o DES)</label>
+       <label class="weapon-prop"><input type="checkbox" id="wArrojadiza"> Arrojadiza (Se pierde al lanzar)</label>
+       <label class="weapon-prop"><input type="checkbox" id="wDistancia"> A distancia (Munición)</label>
+       <label class="weapon-prop"><input type="checkbox" id="wCarga"> De carga (Recarga acción)</label>
+       <label class="weapon-prop"><input type="checkbox" id="wVersatil"> Versátil (1d8/1d10)</label>
+       <label class="weapon-prop"><input type="checkbox" id="wPesada"> Pesada</label>
+       <label class="weapon-prop"><input type="checkbox" id="wLigera"> Ligera</label>
+       <label class="weapon-prop"><input type="checkbox" id="wAlcance"> Alcance</label>
+     </div>
+     <div id="wMunitionDiv" class="hidden" style="margin-top:5px;">
+        <label>Munición actual: <input type="number" id="wMunition" value="20" min="0"></label>
+     </div>`, 
+  () => {
+    const nombre = document.getElementById('wName').value;
+    const daño = document.getElementById('wDmg').value;
+    const bonusArma = parseInt(document.getElementById('wBonus').value) || 0;
+    const statName = document.getElementById('wStat').value;
+    const maestria = maestrias[parseInt(document.getElementById('wMastery').value)];
+    
+    const dosManos = document.getElementById('wDosManos').checked;
+    const sutil = document.getElementById('wSutil').checked;
+    const arrojadiza = document.getElementById('wArrojadiza').checked;
+    const distancia = document.getElementById('wDistancia').checked;
+    const carga = document.getElementById('wCarga').checked;
+    const versatil = document.getElementById('wVersatil').checked;
+    const pesada = document.getElementById('wPesada').checked;
+    const ligera = document.getElementById('wLigera').checked;
+    const alcance = document.getElementById('wAlcance').checked;
+    const municion = distancia ? (parseInt(document.getElementById('wMunition').value) || 0) : 0;
+    
+    if(!nombre || !daño) return;
+    
+    const newWeapon = { 
+        id: generateId(),
+        nombre, 
+        daño, 
+        statAsociado: statName, 
+        bonus: bonusArma, 
+        maestria, 
+        props: { dosManos, sutil, arrojadiza, distancia, carga, versatil, pesada, ligera, alcance },
+        municion: municion,
+        cargada: !carga,
+        equipped: false,
+        tipo_daño: 'contundente'
+    };
+    
+    inventoryWeapons.push(newWeapon);
+    renderInventoryWeapons();
+    guardarGeneral();
+  });
+  
+  setTimeout(() => {
+      const distCheck = document.getElementById('wDistancia');
+      const munDiv = document.getElementById('wMunitionDiv');
+      if(distCheck && munDiv) {
+          distCheck.addEventListener('change', () => {
+              munDiv.classList.toggle('hidden', !distCheck.checked);
+          });
+      }
+  }, 100);
+}
+
+function renderInventoryWeapons() {
+    const container = document.getElementById('inventoryWeaponsList');
+    if (container) {
+        container.innerHTML = '';
+        
+        if(inventoryWeapons.length === 0) {
+            container.innerHTML = '<p style="color:#666;font-style:italic;">Ningún arma en el inventario.</p>';
+            return;
+        }
+        
+        inventoryWeapons.forEach((w, index) => {
+            const div = document.createElement('div');
+            div.className = 'inventory-weapon-item' + (w.equipped ? ' equipped' : '') + (w.props?.carga && !w.cargada ? ' reloading-weap' : '');
+            
+            let propsTags = '';
+            if(w.props?.dosManos) propsTags += '<span style="color:var(--ambar)">[2 Manos]</span> ';
+            if(w.props?.versatil) propsTags += '<span style="color:var(--azul)">[Versátil]</span> ';
+            if(w.props?.sutil) propsTags += '<span style="color:var(--azul)">[Sutil]</span> ';
+            if(w.props?.ligera) propsTags += '<span style="color:var(--exito)">[Ligera]</span> ';
+            if(w.props?.pesada) propsTags += '<span style="color:var(--fallo)">[Pesada]</span> ';
+            if(w.props?.alcance) propsTags += '<span style="color:var(--naranja)">[Alcance]</span> ';
+            if(w.props?.arrojadiza) propsTags += '<span style="color:#aaa">[Arrojadiza]</span> ';
+            if(w.props?.distancia) propsTags += `<span style="color:var(--exito)">[Distancia] Municion: ${w.municion || 0}</span> `;
+            if(w.props?.carga) propsTags += `<span style="color:var(--naranja)">[Carga] ${w.cargada ? 'Cargada' : 'DESCARGADA'}</span> `;
+
+            if (w.tipo_daño) {
+                propsTags += `<span style="color:#aaa">[${w.tipo_daño}]</span> `;
+            }
+
+            let actionBtns = '';
+            if(w.props?.distancia) {
+                actionBtns += `<button class="btn-small-action" style="background:var(--gray)" onclick="cambiarMunicion(${index}, -1)">-Mun</button>`;
+                actionBtns += `<button class="btn-small-action" style="background:var(--gray)" onclick="cambiarMunicion(${index}, 1)">+Mun</button>`;
+            }
+            if(w.props?.carga) {
+                actionBtns += `<button class="btn-small-action" style="background:var(--naranja);color:#000" onclick="recargarArma(${index})" ${w.cargada ? 'disabled' : ''}>Recargar</button>`;
+            }
+            
+            div.innerHTML = `
+                <div>
+                    <div class="weapon-name">${w.nombre} (${w.daño}) ${w.bonus > 0 ? '+'+w.bonus : ''}</div>
+                    <div class="weapon-details">${propsTags}</div>
+                </div>
+                <div class="weapon-actions">
+                    ${actionBtns}
+                    ${w.equipped ? 
+                        `<button class="btn-small-action btn-unequip-inv" onclick="toggleEquipWeapon(${index}, false)">Desequipar</button>` : 
+                        `<button class="btn-small-action btn-equip-inv" onclick="toggleEquipWeapon(${index}, true)">Equipar</button>`
+                    }
+                    <button class="btn-small-action btn-sell-inv" onclick="sellWeapon(${index})">X</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+}
+
+function cambiarMunicion(index, delta) {
+    const w = inventoryWeapons[index];
+    if(!w || !w.props?.distancia) return;
+    w.municion = Math.max(0, (w.municion || 0) + delta);
+    renderInventoryWeapons();
+    guardarGeneral();
+}
+
+function recargarArma(index) {
+    const w = inventoryWeapons[index];
+    if(!w || !w.props?.carga) return;
+    w.cargada = true;
+    alert(`${w.nombre} ha sido recargada. (Consumió una acción)`);
+    renderInventoryWeapons();
+    guardarGeneral();
+}
+
+function toggleEquipWeapon(index, shouldEquip) {
+    const w = inventoryWeapons[index];
+    if(!w) return;
+    
+    if(shouldEquip) {
+        const currentlyEquipped = inventoryWeapons.filter(w => w.equipped).length;
+        if(!w.equipped && currentlyEquipped >= 3) {
+            alert("Solo puedes tener 3 armas equipadas a la vez. Desequipa otra primero.");
+            return;
+        }
+    }
+    
+    w.equipped = shouldEquip;
+    armas = inventoryWeapons.filter(w => w.equipped);
+    
+    renderInventoryWeapons();
+    renderArmas(); 
+    actualizarCalculos();
+    guardarGeneral();
+}
+
+function desequiparArma(){
+  alert("Usa los botones 'Desequipar' junto a cada arma en la lista de abajo.");
+}
+
+function sellWeapon(index) {
+    if(confirm(`¿Deseas tirar o vender ${inventoryWeapons[index].nombre}? Se eliminará del inventario.`)) {
+        if(inventoryWeapons[index].equipped) {
+            inventoryWeapons[index].equipped = false;
+            armas = inventoryWeapons.filter(w => w.equipped);
+            renderArmas();
+        }
+        inventoryWeapons.splice(index, 1);
+        renderInventoryWeapons();
+        guardarGeneral();
+    }
+}
+
+let calcValorActual = '0';
+let calcOperadorPendiente = null;
+let calcValorPrevio = null;
+
+function calcInput(val) {
+    const display = document.getElementById('calcDisplay');
+    if(display) {
+        if(val === '+' || val === '-') {
+            if(calcOperadorPendiente && calcValorPrevio !== null) {
+                calcEquals(); 
+            }
+            calcOperadorPendiente = val;
+            calcValorPrevio = parseFloat(calcValorActual);
+            calcValorActual = '0';
+        } else {
+            if(calcValorActual === '0' && val !== '.') {
+                calcValorActual = val;
+            } else {
+                calcValorActual += val;
+            }
+        }
+        display.textContent = calcValorActual;
+    }
+}
+
+function calcClear() {
+    calcValorActual = '0';
+    calcOperadorPendiente = null;
+    calcValorPrevio = null;
+    const display = document.getElementById('calcDisplay');
+    if (display) display.textContent = '0';
+}
+
+function calcEquals() {
+    const display = document.getElementById('calcDisplay');
+    if(display && calcOperadorPendiente && calcValorPrevio !== null) {
+        const current = parseFloat(calcValorActual);
+        let result = 0;
+        if(calcOperadorPendiente === '+') result = calcValorPrevio + current;
+        
+        display.textContent = result;
+        calcValorActual = result.toString();
+        calcOperadorPendiente = null;
+        calcValorPrevio = null;
+    }
+}
+
+function renderSpellsAndCantrips() {
+    const spellsList = document.getElementById('spellsList');
+    const cantripsList = document.getElementById('cantripsList');
+    if (spellsList) spellsList.innerHTML = '';
+    if (cantripsList) cantripsList.innerHTML = '';
+
+    if(!sheet.hechizos) sheet.hechizos = [];
+
+    sheet.hechizos.forEach(sp => {
+        const element = createSpellElement(sp, sp.nivel === 0 || sp.nivel === "0");
+        if(filterPreparedActive && sp.nivel > 0 && !sp.preparado && element) element.style.display = 'none';
+        if(sp.nivel === 0 || sp.nivel === "0") {
+            if (cantripsList) cantripsList.appendChild(element);
+        } else {
+            if (spellsList) spellsList.appendChild(element);
+        }
+    });
+    actualizarContadorPreparados();
+}
+
+function createSpellElement(sp, isCantrip) {
+    const div = document.createElement('div');
+    div.className = isCantrip ? 'cantrip-item' : 'spell-item';
+    div.dataset.id = sp.id;
+    
+    const safeName = (sp.nombre || "").replace(/"/g, '&quot;');
+    const safeDesc = (sp.desc || "").replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const safeLvl = sp.nivel || 0;
+
+    let html = `<div class="flex" style="margin-bottom:4px;align-items:center;">
+        <input placeholder="Nivel" type="number" min="0" max="9" value="${safeLvl}" style="width:48px;" onchange="updateSpellData('${sp.id}', 'nivel', this.value)">
+        <input placeholder="Nombre" value="${safeName}" style="flex-grow:1;" onchange="updateSpellData('${sp.id}', 'nombre', this.value)">`;
+    
+    if(isCantrip) html += `<button class="btn-usar-spell" onclick="usarTruco('${sp.id}')">USAR</button>`;
+    else html += `<button class="btn-usar-spell" onclick="usarHechizo('${sp.id}')">USAR</button>`;
+    
+    html += `<button style="background:var(--fallo);margin-left:4px;" onclick="deleteSpell('${sp.id}')">X</button></div>`;
+    html += `<div class="flex" style="gap:10px;font-size:0.8rem;color:#aaa;margin-bottom:4px;flex-wrap:wrap;">`;
+    
+    if(!isCantrip) html += `<label><input type="checkbox" ${sp.preparado?'checked':''} onchange="updateSpellData('${sp.id}', 'preparado', this.checked)"> Preparado</label>`;
+    html += `<label><input type="checkbox" ${sp.concentracion?'checked':''} onchange="updateSpellData('${sp.id}', 'concentracion', this.checked)"> Concentración</label>`;
+    if(!isCantrip) html += `<label><input type="checkbox" ${sp.upcastable?'checked':''} onchange="updateSpellData('${sp.id}', 'upcastable', this.checked)"> Upcasting</label>`;
+    html += `</div><textarea placeholder="Descripción" style="width:100%;" onfocus="this.rows=10" onblur="this.rows=2" onchange="updateSpellData('${sp.id}', 'desc', this.value)">${safeDesc}</textarea>`;
+    
+    div.innerHTML = html;
+    return div;
+}
+
+function addSpell(){
+  openModal("Nuevo Hechizo", 
+    `<input id="spName" placeholder="Nombre del hechizo"><input type="number" id="spLvl" placeholder="Nivel (1-9)" min="1" max="9" value="1"><label><input type="checkbox" id="spPrep" checked> Preparado</label><label><input type="checkbox" id="spConc"> Requiere Concentración</label>`, 
+  () => {
+    const lvl = parseInt(document.getElementById('spLvl').value);
+    const name = document.getElementById('spName').value;
+    if(!name) return;
+    sheet.hechizos.push({id: generateId(), nombre: name, nivel: lvl, preparado: document.getElementById('spPrep').checked, concentracion: document.getElementById('spConc').checked, upcastable: false, desc: "" });
+    renderSpellsAndCantrips(); guardarGeneral();
+  });
+}
+
+function addCantrip(){
+  openModal("Nuevo Truco", `<input id="spName" placeholder="Nombre del truco"><label><input type="checkbox" id="spConc"> Requiere Concentración</label>`, 
+  () => {
+    const name = document.getElementById('spName').value;
+    if(!name) return;
+    sheet.hechizos.push({ id: generateId(), nombre: name, nivel: 0, concentracion: document.getElementById('spConc').checked, preparado: true, desc: "" });
+    renderSpellsAndCantrips(); guardarGeneral();
+  });
+}
+
+function usarTruco(id){
+    const sp = sheet.hechizos.find(s => s.id === id);
+    if(!sp) return;
+    
+    const bonifAtq = document.getElementById('bonifAtq').value;
+    let msg = `Lanzas el truco "${sp.nombre}".\n\n`;
+    if(bonifAtq && bonifAtq !== '--') {
+        msg += `Tirada de Ataque: 1d20 + ${bonifAtq}\n`;
+        msg += `CD de Salvación: ${document.getElementById('cdSalv').value}\n\n`;
+    }
+    msg += `(Efectos: ${sp.desc || 'Ver descripción'})`;
+    
+    if(sp.concentracion){
+        if(concentracionActiva) if(!confirm(`Ya estás concentrado en "${concentracionActiva.nombre}". ¿Cambiar a "${sp.nombre}"?`)) return;
+        concentracionActiva = { nombre: sp.nombre, desc: sp.desc };
+        actualizarUIConcentracion();
+    }
+    alert(msg);
+    guardarGeneral();
+}
+
+function usarHechizo(id){
+    const sp = sheet.hechizos.find(s => s.id === id);
+    if(!sp) return;
+
+    if(sp.upcastable) {
+        let nivelesDisponibles = [];
+        for(let lvl = sp.nivel; lvl <= 9; lvl++) {
+            const slotsDisponibles = [...document.querySelectorAll('.slot-row')]
+                .filter(r => r.querySelector('span').textContent === 'N'+lvl)
+                .flatMap(r => [...r.querySelectorAll('.hueco-btn')])
+                .filter(b => b.dataset.gastado === 'false').length;
+            if(slotsDisponibles > 0) nivelesDisponibles.push({ nivel: lvl, tipo: 'normal', cantidad: slotsDisponibles });
+        }
+        if(magiaPacto.activo) {
+            const pactosDisponibles = magiaPacto.usados.filter(u => !u).length;
+            if(pactosDisponibles > 0 && magiaPacto.nivel >= sp.nivel) nivelesDisponibles.push({ nivel: magiaPacto.nivel, tipo: 'pacto', cantidad: pactosDisponibles });
+        }
+        
+        if(nivelesDisponibles.length === 0) { alert("No tienes slots disponibles para este hechizo."); return; }
+        
+        let optionsHtml = `<p>Hechizo: <strong>${sp.nombre}</strong> (Base N${sp.nivel})</p><select id="spellLevelSelect" style="width:100%;padding:10px;margin-bottom:10px;">`;
+        nivelesDisponibles.forEach(opt => {
+            const label = opt.tipo === 'pacto' ? `Pacto N${opt.nivel}` : `Nivel ${opt.nivel}`;
+            optionsHtml += `<option value="${opt.nivel}" data-tipo="${opt.tipo}">${label} (${opt.cantidad} disponibles)</option>`;
+        });
+        optionsHtml += `</select>`;
+        
+        openModal("Lanzar Hechizo (Upcasting)", optionsHtml, () => {
+            const select = document.getElementById('spellLevelSelect');
+            if (select) ejecutarLanzamiento(sp, parseInt(select.value), select.selectedOptions[0].dataset.tipo);
+        });
+    } else {
+        const nivelBase = sp.nivel;
+        const slotBtn = [...document.querySelectorAll('.slot-row')]
+            .filter(r => r.querySelector('span').textContent === 'N'+nivelBase)
+            .flatMap(r => [...r.querySelectorAll('.hueco-btn')])
+            .find(b => b.dataset.gastado === 'false');
+            
+        let usoPacto = false;
+        let slotEncontrado = slotBtn;
+        
+        if(!slotEncontrado && magiaPacto.activo && magiaPacto.nivel >= nivelBase) {
+             const index = magiaPacto.usados.findIndex(u => !u);
+             if(index !== -1) {
+                 usoPacto = true;
+                 slotEncontrado = true;
+             }
+        }
+        
+        if(!slotEncontrado) { alert(`No tienes slots de Nivel ${nivelBase} disponibles para lanzar "${sp.nombre}".`); return; }
+        
+        ejecutarLanzamiento(sp, nivelBase, usoPacto ? 'pacto' : 'normal');
+    }
+}
+
+function ejecutarLanzamiento(sp, nivelLanzamiento, tipoSlot) {
+    if(tipoSlot === 'pacto') {
+        const index = magiaPacto.usados.findIndex(u => !u);
+        if(index === -1) { alert("No hay slots de pacto disponibles."); return; }
+        magiaPacto.usados[index] = true; renderMagiaPacto();
+    } else {
+        const hueco = [...document.querySelectorAll('.hueco-btn')].find(b => 
+            b.parentElement.querySelector('span').textContent === 'N'+nivelLanzamiento && 
+            b.dataset.gastado === 'false');
+        if(!hueco){ alert(`Error inesperado: No quedan slots de Nivel ${nivelLanzamiento}.`); return; }
+        hueco.dataset.gastado = 'true'; hueco.classList.add('gastado'); hueco.style.background = 'var(--usoOn)';
+    }
+    
+    if(sp.concentracion){
+        if(concentracionActiva){ if(confirm(`Ya estás concentrado en "${concentracionActiva.nombre}". ¿Cambiar a "${sp.nombre}"?`)) concentracionActiva = { nombre: sp.nombre, desc: sp.desc }; }
+        else concentracionActiva = { nombre: sp.nombre, desc: sp.desc };
+        actualizarUIConcentracion();
+    }
+    
+    const bonifAtq = document.getElementById('bonifAtq').value;
+    let msg = `Lanzas "${sp.nombre}" a Nivel ${nivelLanzamiento}.\n\n`;
+    if(nivelLanzamiento > sp.nivel) msg += `¡USANDO UPCASTING! (Base N${sp.nivel} -> N${nivelLanzamiento})\n\n`;
+    
+    if(bonifAtq && bonifAtq !== '--') {
+        msg += `Tirada de Ataque: 1d20 + ${bonifAtq}\n`;
+    }
+    msg += `CD de Salvación: ${document.getElementById('cdSalv').value}`;
+    
+    alert(msg);
+    guardarGeneral();
+}
+
+function updateSpellData(id, key, value){
+    const sp = sheet.hechizos.find(s => s.id === id);
+    if(sp){
+        if(key === 'nivel') sp[key] = parseInt(value) || 0;
+        else sp[key] = value;
+        if(key === 'nivel' || key === 'preparado') renderSpellsAndCantrips();
+        guardarGeneral();
+    }
+}
+
+function deleteSpell(id){
+    if(confirm("¿Borrar este hechizo/truco?")){
+        sheet.hechizos = sheet.hechizos.filter(s => s.id !== id);
+        renderSpellsAndCantrips(); guardarGeneral();
+    }
+}
+
+function actualizarContadorPreparados() {
+    const statLanz = document.getElementById('modHabLanz').value;
+    const nivel = parseInt(document.getElementById('nivel').value) || 1;
+    let maxPreparados = statLanz ? getMod(statLanz) + nivel : 0;
+    const preparados = (sheet.hechizos || []).filter(sp => sp.nivel > 0 && sp.preparado).length;
+    
+    const preparedCount = document.getElementById('preparedCount');
+    const preparedMax = document.getElementById('preparedMax');
+    const counter = document.getElementById('preparedCounter');
+    const countSpan = document.getElementById('preparedCount');
+    
+    if (preparedCount) preparedCount.textContent = preparados;
+    if (preparedMax) preparedMax.textContent = maxPreparados;
+    
+    if(counter && countSpan) {
+        if(preparados > maxPreparados && maxPreparados > 0) { countSpan.className = 'warning'; counter.style.borderColor = 'var(--fallo)'; }
+        else { countSpan.className = 'ok'; counter.style.borderColor = 'var(--exito)'; }
+    }
+}
+
+function toggleFilterPrepared() {
+    filterPreparedActive = !filterPreparedActive;
+    const btnFilter = document.getElementById('btnFilterPrepared');
+    if (btnFilter) btnFilter.classList.toggle('active', filterPreparedActive);
+    renderSpellsAndCantrips();
+}
+
+function addFeat(){
+  const div=document.createElement('div');div.className='section';
+  div.innerHTML='<input placeholder="Nombre dote" style="width:160px;" onchange="guardarGeneral()"><textarea placeholder="Descripción" rows="3" style="width:100%;" onfocus="this.rows=10" onblur="this.rows=3" onchange="guardarGeneral()"></textarea>';
+  document.getElementById('featsList').appendChild(div);
+}
+function addTrait(){
+  const div=document.createElement('div');div.className='section';
+  div.innerHTML='<input placeholder="Nombre rasgo" style="width:160px;" onchange="guardarGeneral()"><textarea placeholder="Descripción" rows="3" style="width:100%;" onfocus="this.rows=10" onblur="this.rows=3" onchange="guardarGeneral()"></textarea>';
+  document.getElementById('traitsList').appendChild(div);
+}
+
+function renderBonusList() {
+    const list = document.getElementById('bonusListContainer');
+    if (list) {
+        list.innerHTML = '';
+        if(!sheet.bonificadores || sheet.bonificadores.length === 0) { list.innerHTML = '<p style="color:#666;font-style:italic;">Ninguno activo.</p>'; return; }
+        sheet.bonificadores.forEach((b, i) => {
+            const item = document.createElement('div');
+            item.className = 'bonus-item';
+            item.innerHTML = `<span>${b.nombre}: <strong>+${b.valor}</strong></span><button onclick="eliminarBonus(${i})">X</button>`;
+            list.appendChild(item);
+        });
+    }
+}
+
+function abrirModalBonusSimplificado() {
+    const opciones = ["Fuerza", "Destreza", "Constitución", "Inteligencia", "Sabiduría", "Carisma", "Daño", "CA", "Ataque"];
+    let selectHtml = `<select id="newBonusNombre" style="width:100%;margin-bottom:10px;">`;
+    opciones.forEach(op => selectHtml += `<option value="${op.toLowerCase()}">${op}</option>` );
+    selectHtml += `</select>`;
+
+    openModal("Añadir Bonificador", 
+        `<label>¿Qué mejora?</label>${selectHtml}<label>¿Cuánto mejora? (Valor):</label><input type="number" id="newBonusValor" placeholder="Ej: 2" min="1" max="10" value="1">`,
+    () => {
+        const nombre = document.getElementById('newBonusNombre').value;
+        const valor = parseInt(document.getElementById('newBonusValor').value) || 0;
+        if(nombre && valor > 0) {
+            if(!sheet.bonificadores) sheet.bonificadores = [];
+            
+            let tipo = 'habilidad';
+            if(nombre === 'daño') tipo = 'dano';
+            else if(nombre === 'ca') tipo = 'ca';
+            else if(nombre === 'ataque') tipo = 'ataque';
+            
+            sheet.bonificadores.push({ tipo: tipo, nombre: nombre, valor: valor });
+            guardarGeneral(); actualizarCalculos(); renderBonusList();
+            alert(`Bonificador +${valor} a ${nombre} añadido.`);
+        } else alert("Introduce un valor válido.");
+    });
+}
+
+function eliminarBonus(index) { sheet.bonificadores.splice(index, 1); guardarGeneral(); actualizarCalculos(); renderBonusList(); }
+
+function renderActions(){
+  const grid=document.getElementById('actionsGrid');
+  if (grid) {
+    grid.innerHTML = ''; 
+    actions.forEach(ac=>{
+      const btn=document.createElement('button');
+      setSafeText(btn, ac.name);
+      btn.disabled = usedAction;
+      btn.onclick=(e)=>{
+        if(usedAction){alert('Ya usaste tu acción este turno.');return;}
+        
+        if(ac.id === "cast") {
+            const bonifAtq = document.getElementById('bonifAtq').value;
+            const cdSalv = document.getElementById('cdSalv').value;
+            let msg = "Preparándose para lanzar magia...\n\n";
+            if(bonifAtq && bonifAtq !== '--') {
+                msg += `Tirada de Ataque con Hechizo: 1d20 + ${bonifAtq}\n`;
+            }
+            msg += `CD de Salvación de Hechizos: ${cdSalv}`;
+            alert(msg);
+            usedAction = true; 
+            updateActionButtons(); 
+            switchTab(ac.goto, e); 
+            return;
+        }
+        
+        if(ac.goto){usedAction = true; updateActionButtons(); switchTab(ac.goto, e); return;}
+        usedAction=true; updateActionButtons();
+        showAction(ac);
+      };
+      grid.appendChild(btn);
+    });
+  }
+  renderArmas();
+}
+
+function renderArmas(){
+  [...document.querySelectorAll('.btn-ataque-arma')].forEach(b=>b.remove());
+  const grid=document.getElementById('actionsGrid');
+  
+  if (grid) {
+    armas.forEach((w,i)=>{
+      let modAtk = w.props?.sutil ? Math.max(getMod('fuerza'), getMod('destreza')) : getMod(w.statAsociado);
+      const bonusDanoRasgos = getActiveBonus('dano', 'daño');
+      const bonusAtkRasgos = getActiveBonus('ataque', 'ataque');
+      
+      const totalAtk = getBonifComp() + modAtk + w.bonus + bonusAtkRasgos;
+      const totalDanoDisplay = w.bonus + modAtk + bonusDanoRasgos;
+      
+      let txt = `Atacar: ${w.nombre}`;
+      let disabled = usedAction && !multiataqueActivo;
+      
+      if(w.props?.carga && !w.cargada) {
+          txt += " [RECARGAR]";
+          disabled = true;
+      }
+      
+      if(w.props?.distancia && w.municion <= 0) {
+          txt += " [SIN MUNICIÓN]";
+          disabled = true;
+      }
+      
+      const btn = document.createElement('button');
+      btn.className = 'btn-ataque-arma';
+      btn.innerHTML = txt;
+      btn.disabled = disabled;
+      btn.onclick=()=>atacarConArma(i);
+      grid.appendChild(btn);
+    });
+  }
+  updateActionButtons();
+}
+
+function atacarConArma(i) {
+    const w = armas[i];
+    if(!w) return;
+    
+    if(w.props?.carga && !w.cargada) { alert("El arma está descargada. Usa una acción para recargar en Inventario."); return; }
+    if(w.props?.distancia && w.municion <= 0) { alert("No tienes munición para este arma."); return; }
+    
+    if(usedAction && !multiataqueActivo){alert('Ya usaste tu acción este turno.');return;}
+    if(!multiataqueActivo) usedAction=true;
+    
+    let mod = w.props?.sutil ? Math.max(getMod('fuerza'), getMod('destreza')) : getMod(w.statAsociado);
+    const bonusDanoRasgos = getActiveBonus('dano', 'daño');
+    const bonusAtkRasgos = getActiveBonus('ataque', 'ataque');
+    
+    const totalAtk = getBonifComp() + mod + w.bonus + bonusAtkRasgos;
+    const totalDano = w.bonus + mod + bonusDanoRasgos;
+    
+    let msg = `¡Atacas con ${w.nombre}!\n\n`;
+    msg += `Tirada de Ataque: 1d20 + ${totalAtk}\n`;
+    msg += `Daño: ${w.daño} + ${totalDano}\n\n`;
+    msg += `Maestría: ${w.maestria.nombre}\n${w.maestria.desc}\n`;
+    
+    if(w.props?.distancia) {
+        w.municion--;
+        msg += `\n(Gastas 1 munición. Te quedan ${w.municion})`;
+        renderInventoryWeapons();
+    }
+    if(w.props?.arrojadiza) {
+        msg += `\n¡ES UN ARMA ARROJADIZA! Si la lanzas, el arma cae en el suelo.`;
+    }
+    if(w.props?.carga) {
+        w.cargada = false;
+        msg += `\n¡DISPARO! El arma está DESCARGADA.`;
+        renderInventoryWeapons();
+    }
+    
+    if(ventajaActiva) msg+='\n\n¡Tirada con VENTAJA!';
+    if(desventajaActiva) msg+='\n\nTirada con DESVENTAJA';
+    
+    alert(msg);
+    updateActionButtons(); 
+    guardarGeneral();
+}
+
+function showAction(ac){
+  const div=document.getElementById('actionDetail');
+  if(!sheet.action_notes) sheet.action_notes = {};
+  const currentNote = sheet.action_notes[ac.id] || '';
+  if (div) {
+    div.innerHTML = `<h4>${ac.name}</h4><p>${ac.desc}</p><textarea class="action-note" placeholder="Notas para esta acción..." rows="2" oninput="saveActionNote('${ac.id}', this)"></textarea>`;
+    const ta = div.querySelector('textarea'); if(ta) ta.value = currentNote;
+    div.classList.remove('hidden');
+    autoCerrar(div);
+  }
+}
+function saveActionNote(id, el){ if(!sheet.action_notes) sheet.action_notes = {}; sheet.action_notes[id] = el.value; store(); }
+function updateActionButtons(){
+  [...document.querySelectorAll('#actionsGrid button:not(.btn-ataque-arma)')].forEach(b => b.disabled = usedAction);
+  [...document.querySelectorAll('.btn-ataque-arma')].forEach(b=>b.disabled=(usedAction && !multiataqueActivo));
+  const btnAccAdic = document.getElementById('btnAccAdic');
+  const btnReaccion = document.getElementById('btnReaccion');
+  const btnMultiataque = document.getElementById('btnMultiataque');
+  
+  if (btnAccAdic) btnAccAdic.disabled=usedBonus;
+  if (btnReaccion) btnReaccion.disabled=usedReaction;
+  if (btnMultiataque) btnMultiataque.disabled=usedAction;
+}
+function nextTurn(){
+  ['accAdic','reaccion'].forEach(id=>{ const el=document.getElementById(id); if (el) { sheet[`txt_${id}`]=el.value; el.classList.add('hidden'); } });
+  usedAction=false;usedBonus=false;usedReaction=false;multiataqueActivo=false;
+  ventajaActiva=false;desventajaActiva=false;actualizarBotonesVD();
+  const actionDetail = document.getElementById('actionDetail');
+  if (actionDetail) actionDetail.classList.add('hidden');
+  updateActionButtons(); guardarGeneral();
+}
+function usarAccAdic(){ if(usedBonus){alert('Ya usaste tu acción adicional.');return;} const ta=document.getElementById('accAdic'); if (ta) { ta.classList.remove('hidden'); ta.value=sheet[`txt_${ta.id}`]||''; } usedBonus=true; updateActionButtons(); autoCerrar(ta); }
+function usarReaccion(){ if(usedReaction){alert('Ya usaste tu reacción.');return;} const ta=document.getElementById('reaccion'); if (ta) { ta.classList.remove('hidden'); ta.value=sheet[`txt_${ta.id}`]||''; } usedReaction=true; updateActionButtons(); autoCerrar(ta); }
+function usarMultiataque(){ if(usedAction){alert('Ya usaste tu acción este turno.');return;} multiataqueActivo=true; updateActionButtons(); }
+function autoCerrar(el){ if (el) setTimeout(()=>{el.classList.add('hidden');},10000); }
+
+function toggleInspiracion(){inspiracionActiva=!inspiracionActiva;const btn=document.getElementById('btnInspiracion'); if(btn) btn.classList.toggle('activo',inspiracionActiva);guardarGeneral();}
+function toggleVentajaIni(){ventajaIni=!ventajaIni;desventajaIni=false;const btnV=document.getElementById('btnVentajaIni'); const btnD=document.getElementById('btnDesventajaIni'); if(btnV) btnV.classList.toggle('activo',ventajaIni); if(btnD) btnD.classList.remove('activo');guardarGeneral();}
+function toggleDesventajaIni(){desventajaIni=!desventajaIni;ventajaIni=false;const btnV=document.getElementById('btnVentajaIni'); const btnD=document.getElementById('btnDesventajaIni'); if(btnD) btnD.classList.toggle('activo',desventajaIni); if(btnV) btnV.classList.remove('activo');guardarGeneral();}
+function tirarIniciativa(){
+  const mod=getMod('destreza');
+  const bonus=parseInt(document.getElementById('iniciativaBonus').value)||0;
+  let msg=`Tirada de Iniciativa: 1d20 + ${mod+bonus}`;
+  if(ventajaIni)msg+=' (tira dos veces, elige la MEJOR)';
+  if(desventajaIni)msg+=' (tira dos veces, elige la PEOR)';
+  alert(msg);
+}
+
+function renderStates(){
+  const grid=document.getElementById('statesGrid');
+  if (grid) {
+    grid.innerHTML = '';
+    states.forEach(st=>{
+      const btn=document.createElement('button');
+      btn.className='state-btn off';
+      setSafeText(btn, st.name);
+      btn.dataset.id=st.id;
+      btn.onclick=()=>{toggleState(btn,st);};
+      grid.appendChild(btn);
+    });
+  }
+}
+function toggleState(btn,st){ if (btn) { btn.classList.toggle('on');btn.classList.toggle('off'); } actualizarPanelEstados();actualizarAlertaEstado(); guardarGeneral(); }
+function actualizarPanelEstados(){
+  const panel=document.getElementById('statePanel');
+  const activos=[...document.querySelectorAll('.state-btn.on')].map(b=>b.dataset.id);
+  if(activos.length===0){if(panel) panel.classList.add('hidden');return;}
+  if (panel) {
+    panel.classList.remove('hidden');
+    let html = "";
+    activos.forEach(id=>{ const st=states.find(s=>s.id===id); html += `<strong>${st.name}</strong>: ${st.desc}<br><br>`; });
+    panel.innerHTML = html;
+  }
+}
+
+function actualizarAlertaEstado(){
+  const alerta=document.getElementById('estadoAlerta');
+  const hayEstados=[...document.querySelectorAll('.state-btn.on')].length>0;
+  const hayAgotamiento = exhaustionLevel > 0;
+  
+  if(!hayEstados && !hayAgotamiento){ 
+    if (alerta) {
+      alerta.classList.remove('parpadeo-animado'); 
+      alerta.classList.add('hidden'); 
+    }
+    return; 
+  }
+  
+  if (alerta) {
+    alerta.classList.remove('hidden');
+    alerta.classList.add('parpadeo-animado');
+    
+    let mensaje = "Estado activo";
+    if(hayAgotamiento) mensaje = `Agotamiento Nv${exhaustionLevel}`;
+    if(hayEstados && hayAgotamiento) mensaje = "Múltiples efectos activos";
+    
+    alerta.textContent = mensaje;
+  }
+}
+
+function addHabEspecial(){
+  const clase = document.getElementById('clase').value.toLowerCase().trim();
+  const esMonje = (clase === 'monje' || clase === 'monk');
+  
+  let html = `
+    <input id="hName" placeholder="Nombre">
+    <textarea id="hDesc" placeholder="Descripción/Efectos" rows="3" style="width:100%;margin-bottom:8px;"></textarea>
+    <label>Tipo de recuperación:<select id="hRecovery" style="width:100%" onchange="toggleKiOption()">
+        <option value="largo">Descanso Largo</option>
+        <option value="corto">Descanso Corto</option>
+    </select></label>`;
+    
+  if(esMonje) html += `<label><input type="checkbox" id="hKiCheck" onchange="toggleKiOption()"> Consume Puntos de Ki</label>`;
+  html += `<div id="hUsesContainer"><input type="number" id="hUses" placeholder="Usos máximos" min="1"></div>`;
+
+  openModal("Nueva Habilidad Especial", html, () => {
+    const nombre = document.getElementById('hName').value;
+    const desc = document.getElementById('hDesc').value;
+    const recovery = document.getElementById('hRecovery').value;
+    const esKi = esMonje && document.getElementById('hKiCheck')?.checked;
+    let usos = 0; let costeKi = 0;
+    
+    if(esKi) {
+        costeKi = parseInt(document.getElementById('hUses').value) || 1;
+    } else {
+        usos = parseInt(document.getElementById('hUses').value) || 1;
+    }
+    
+    if(!nombre) return;
+    habSpecs.push({ nombre, desc, usos, recovery, slots: Array(usos).fill(false), ki: esKi, costeKi: costeKi });
+    renderHabSpecs();guardarGeneral();
+  });
+}
+
+function toggleKiOption() {
+    const check = document.getElementById('hKiCheck');
+    const container = document.getElementById('hUsesContainer');
+    if(!check || !container) return;
+    if(check.checked) container.innerHTML = `<input type="number" id="hKiCost" placeholder="Coste de Ki (ej: 1)" value="1">`;
+    else container.innerHTML = `<input type="number" id="hUses" placeholder="Usos máximos" min="1">`;
+}
+
+function delHabEspecial(){
+  if(habSpecs.length===0){alert('No hay habilidades que borrar');return;}
+  let optionsHtml = `<select id="modalSelect">`;
+  habSpecs.forEach((h,i) => optionsHtml += `<option value="${i}">${h.nombre}</option>`);
+  optionsHtml += `</select>`;
+  openModal("Borrar Habilidad", "Selecciona la habilidad:<br>" + optionsHtml, () => {
+    habSpecs.splice(parseInt(document.getElementById('modalSelect').value),1);
+    renderHabSpecs();guardarGeneral();
+  });
+}
+
+function renderHabSpecs(){
+  const div=document.getElementById('habSpecsList');
+  if (div) {
+    div.innerHTML='';
+    habSpecs.forEach((h,idx)=>{
+      const s=document.createElement('div');s.className='section';
+      let html=`<div class="flex" style="justify-content:space-between;align-items:center;"><strong>${h.nombre}</strong>`;
+      if(h.ki) html += `<span style="margin-left:auto;color:var(--monje);">Coste: ${h.costeKi} Ki</span>`;
+      else html += `<span style="margin-left:auto;">${h.usos} usos (${h.recovery === 'corto' ? 'Corto' : 'Largo'})</span>`;
+      html += `</div>`;
+      
+      if(h.desc) html += `<p style="font-size:0.8rem;color:#aaa;margin:4px 0;">${h.desc}</p>`;
+      
+      html += `<div class="hab-spec-row">`;
+      
+      if(h.ki) html += `<button onclick="usarHabKi(${idx})" style="background:var(--monje);color:#fff;padding:4px 8px;">Usar (${h.costeKi} Ki)</button>`;
+      else for(let i=0;i<h.usos;i++){ html+=`<button class="hab-hueco ${h.slots[i]?'gastado':''}" onclick="toggleHabSlot(${idx},${i})"></button>`; }
+      html+=`</div>`;
+      s.innerHTML = html;
+      div.appendChild(s);
+    });
+  }
+}
+
+function toggleHabSlot(idx,i){ habSpecs[idx].slots[i]=!habSpecs[idx].slots[i]; renderHabSpecs();guardarGeneral(); }
+
+function usarHabKi(idx) {
+    const h = habSpecs[idx];
+    if(!h || !h.ki) return;
+    const kiNecesario = h.costeKi || 1;
+    if(sheet.ki >= kiNecesario) {
+        sheet.ki -= kiNecesario;
+        alert(`Has usado ${h.nombre}. Gastados ${kiNecesario} Ki. Quedan ${sheet.ki} puntos.`);
+        renderDynamicResources(); guardarGeneral();
+    } else alert(`No tienes suficiente Ki. Necesitas ${kiNecesario} y tienes ${sheet.ki}.`);
+}
+
+function addNpc(){
+  const div=document.createElement('div');div.className='section';
+  div.innerHTML='<input placeholder="Nombre NPC" style="width:160px;" onchange="guardarGeneral()"><textarea placeholder="Nota" rows="2" style="width:100%;" onchange="guardarGeneral()"></textarea>';
+  document.getElementById('npcList').appendChild(div);
+}
+
+function addSessionNote(){
+  openModal("Nota de Sesión", `<textarea id="modalInput" style="height:80px;width:100%" placeholder="Escribe aquí..."></textarea>`, () => {
+    const note = document.getElementById('modalInput').value;
+    if(!note) return;
+    const p=document.createElement('p');
+    p.textContent=new Date().toLocaleString() + ' - ' + note;
+    document.getElementById('sessionNotes').appendChild(p);
+    guardarGeneral();
+  });
+}
+
+function toggleSalvacion(btn){
+  if (btn) {
+    const on=btn.dataset.state==='on';
+    btn.dataset.state=on?'off':'on';
+    btn.style.background=btn.dataset.state==='on' ?(btn.dataset.type==='exito'?'var(--exito)':'var(--fallo)'):'transparent';
+    guardarGeneral();
+  }
+}
+
+function toggleHab(btn){ if (btn) btn.classList.toggle('active'); actualizarCalculos(); guardarGeneral(); }
+
+function desactivarEstados(){
+  [...document.querySelectorAll('.state-btn.on')].forEach(b=>{b.classList.remove('on');b.classList.add('off');});
+  actualizarPanelEstados();actualizarAlertaEstado();
+}
+
+function descansoCorto(){
+  openModal("Descanso Corto", `<p>Puedes gastar dados de golpe. Magia de Pacto se recuperará.</p><p>¿Continuar?</p>`, () => {
+    habSpecs.forEach(h => { if(h.recovery === 'corto' && !h.ki) h.slots.fill(false); });
+    recuperarMagiaPacto();
+    desactivarEstados();
+    renderHabSpecs(); guardarGeneral();
+    alert("Descanso corto completado.");
+  });
+}
+
+function descansoLargo(){
+  if(!confirm("¿Confirmar descanso largo?")) return;
+  const max=document.getElementById('hpMax').value;
+  document.getElementById('hpAct').value=max;
+  document.getElementById('hpTemp').value = 0;
+  
+  [...document.querySelectorAll('.hueco-btn')].forEach(b=>{
+    b.dataset.gastado='false'; b.classList.remove('gastado'); b.style.background='var(--gray)';
+  });
+  
+  habSpecs.forEach(h => { if(!h.ki) h.slots.fill(false); });
+  recuperarMagiaPacto();
+  
+  if(sheet.dadosGolpeUsados && sheet.dadosGolpeUsados.length > 0) {
+      const gastados = sheet.dadosGolpeUsados.filter(d => d).length;
+      const recuperados = Math.ceil(gastados / 2); 
+      let count = 0;
+      for(let i = sheet.dadosGolpeUsados.length - 1; i >= 0 && count < recuperados; i--) {
+          if(sheet.dadosGolpeUsados[i]) { sheet.dadosGolpeUsados[i] = false; count++; }
+      }
+  }
+  renderDadosGolpe();
+  
+  if(exhaustionLevel > 0) { exhaustionLevel = Math.max(0, exhaustionLevel - 1); renderExhaustion(); }
+  
+  const clase = document.getElementById('clase').value.toLowerCase().trim();
+  if(clase === 'hechicero' || clase === 'sorcerer') {
+      const nivel = parseInt(document.getElementById('nivel').value) || 1;
+      sheet.sorceryPoints = { current: nivel, max: nivel };
+  }
+  if(clase === 'monje' || clase === 'monk') {
+      const nivel = parseInt(document.getElementById('nivel').value) || 1;
+      sheet.ki = nivel;
+  }
+  
+  desactivarEstados();
+  renderHabSpecs(); guardarGeneral();
+  alert("Descanso largo completado.");
+}
+
+function guardarGeneral(){
+  const ids = ['nombre','nivel','hpMax','hpAct','hpTemp','caTemp','bonifComp','velPies','velMetros','velCas','oro','plata','bronce','inventario','backstory','alignCurrent','maestrias','modHabLanz','cdSalv','bonifAtq','raza','clase','subclase','trasfondo','idiomas','descripcion','notasLibres','dadosGolpe','dadoGolpeTipo'];
+  
+  ids.forEach(id => { const el = document.getElementById(id); if(el) sheet[id] = el.value; });
+  
+  sheet.armorType = document.getElementById('armorType').value;
+  sheet.armorBase = document.getElementById('armorBase').value;
+  sheet.armorBonus = document.getElementById('armorBonus').value;
+  sheet.shieldEquipped = document.getElementById('shieldEquipped').value;
+  sheet.ca = document.getElementById('ca').value;
+  
+  const unarmoredRadio = document.querySelector('input[name="unarmoredType"]:checked');
+  sheet.unarmoredType = unarmoredRadio ? unarmoredRadio.value : null;
+
+  const accAdicEl = document.getElementById('accAdic'); const reaccionEl = document.getElementById('reaccion'); const actionNotesEl = document.getElementById('actionNotes');
+  if(accAdicEl) sheet.txt_accAdic = accAdicEl.value;
+  if(reaccionEl) sheet.txt_reaccion = reaccionEl.value;
+  if(actionNotesEl) sheet.txt_actionNotes = actionNotesEl.value;
+
+  sheet.invObj1 = document.getElementById('invObj1').value; sheet.invObj2 = document.getElementById('invObj2').value; sheet.invObj3 = document.getElementById('invObj3').value;
+
+  sheet.feats = [...document.querySelectorAll('#featsList > div')].map(div => ({ nombre: div.querySelector('input')?.value || '', desc: div.querySelector('textarea')?.value || '' }));
+  sheet.traits = [...document.querySelectorAll('#traitsList > div')].map(div => ({ nombre: div.querySelector('input')?.value || '', desc: div.querySelector('textarea')?.value || '' }));
+  
+  sheet.npcs = [...document.querySelectorAll('#npcList > div')].map(div => ({ nombre: div.querySelector('input')?.value || '', nota: div.querySelector('textarea')?.value || '' }));
+  sheet.sessionNotes = [...document.querySelectorAll('#sessionNotes p')].map(p => p.textContent);
+
+  sheet.stats={};
+  [...document.querySelectorAll('.stat-card')].forEach(card=>{
+    const stat=card.dataset.stat;
+    sheet.stats[stat]={
+      puntos:card.querySelector('.puntos').value,
+      mod:card.querySelector('.mod').value,
+      habilidades:[...card.querySelectorAll('.hab-row')].map(row => ({ active: row.querySelector('button').classList.contains('active'), extra: row.querySelector('.extra').value }))
+    };
+  });
+  
+  sheet.salvaciones=[...document.querySelectorAll('.salv-btn')].map(b=>({type:b.dataset.type,state:b.dataset.state}));
+  sheet.estados=[...document.querySelectorAll('.state-btn')].map(b=>({id:b.dataset.id,on:b.classList.contains('on')}));
+  sheet.slots=[...document.querySelectorAll('.hueco-btn')].map(b=>({gastado:b.dataset.gastado, nivel: b.dataset.nivel})); 
+  sheet.habSpecs=habSpecs;
+  sheet.armas=armas; 
+  sheet.inventoryWeapons=inventoryWeapons; 
+  
+  sheet.exhaustionLevel = exhaustionLevel;
+  sheet.magiaPacto = magiaPacto;
+  sheet.filterPreparedActive = filterPreparedActive;
+  sheet.wildshapeActive = wildshapeActive;
+  
+  sheet.ventajaActiva=ventajaActiva;
+  sheet.desventajaActiva=desventajaActiva;
+  sheet.concentracionActiva=concentracionActiva;
+  sheet.inspiracionActiva=inspiracionActiva;
+  sheet.ventajaIni=ventajaIni;
+  sheet.desventajaIni=desventajaIni;
+  
+  store();
+}
+
+function store(){ try{ localStorage.setItem('dndSheet',JSON.stringify(sheet)); showSaveStatus("Guardado OK"); }catch(e){ console.warn('Error guardando',e); showSaveStatus("Error"); } }
+function showSaveStatus(msg) { const el = document.getElementById('saveStatus'); if (el) { el.textContent = msg; setTimeout(() => { el.textContent = "Autoguardado activo"; }, 2000); } }
+
+function exportSheet() {
+  guardarGeneral();
+  const data = JSON.stringify(sheet, null, 2);
+  openModal("Exportar Ficha", `<p style="font-size:0.9rem;margin-bottom:10px;">Copia este texto:</p><textarea id="exportArea" style="height:200px;font-size:0.8rem;width:100%;" readonly></textarea>`, () => { });
+  setTimeout(() => { const ta = document.getElementById('exportArea'); if(ta) { ta.value = data; ta.select(); } }, 100);
+}
+
+function toggleImport() { const container = document.getElementById('importContainer'); if (container) container.classList.toggle('hidden'); if (!container.classList.contains('hidden')) { const importArea = document.getElementById('importArea'); if (importArea) { importArea.value = ''; importArea.focus(); } } }
+function loadImportedData() {
+    const raw = document.getElementById('importArea').value;
+    if(!raw) { alert("No has pegado nada."); return; }
+    try {
+        const obj = JSON.parse(raw);
+        if(confirm("¿Sobrescribir la ficha actual con los datos pegados?")) { sheet = obj; store(); applySheetToUI(); alert("¡Ficha importada con éxito!"); toggleImport(); }
+    } catch(e) { alert("Error: El texto pegado no es un JSON válido."); }
+}
+
+function applySheetToUI() {
+    if(!sheet.action_notes) sheet.action_notes = {};
+    if(!sheet.hechizos) sheet.hechizos = [];
+    if(!sheet.bonificadores) sheet.bonificadores = [];
+
+    // NUEVO: Procesar Rasgos del Personaje (desde el creador)
+    if (sheet.rasgos && Array.isArray(sheet.rasgos) && sheet.rasgos.length > 0) {
+        const featsList = document.getElementById('featsList');
+        const traitsList = document.getElementById('traitsList');
+        
+        if (featsList) featsList.innerHTML = '';
+        if (traitsList) traitsList.innerHTML = '';
+
+        sheet.feats = sheet.feats || [];
+        sheet.traits = sheet.traits || [];
+
+        sheet.rasgos.forEach(rasgo => {
+            const div = document.createElement('div');
+            div.className = 'section';
+
+            const nombreSeguro = (rasgo.nombre || "").replace(/"/g, '&quot;');
+            const descSegura = (rasgo.descripcion || "").replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            if (rasgo.tipo === 'dote' || (rasgo.nombre && rasgo.nombre.toLowerCase().includes('dote'))) {
+                if (featsList) {
+                    div.innerHTML = `<input placeholder="Nombre dote" style="width:160px;" value="${nombreSeguro}" onchange="guardarGeneral()"><textarea placeholder="Descripción" rows="3" style="width:100%;" onfocus="this.rows=10" onblur="this.rows=3" onchange="guardarGeneral()">${descSegura}</textarea>`;
+                    featsList.appendChild(div);
+                }
+                sheet.feats.push({ nombre: rasgo.nombre, desc: rasgo.descripcion || '' });
+            } else {
+                if (traitsList) {
+                    div.innerHTML = `<input placeholder="Nombre rasgo" style="width:160px;" value="${nombreSeguro}" onchange="guardarGeneral()"><textarea placeholder="Descripción" rows="3" style="width:100%;" onfocus="this.rows=10" onblur="this.rows=3" onchange="guardarGeneral()">${descSegura}</textarea>`;
+                    traitsList.appendChild(div);
+                }
+                sheet.traits.push({ nombre: rasgo.nombre, desc: rasgo.descripcion || '' });
+            }
+        });
+    }
+    
+    const simpleIds = ['nombre','nivel','hpMax','hpAct','hpTemp','caTemp','bonifComp','velPies','velMetros','velCas','oro','plata','bronce','inventario','backstory','alignCurrent','maestrias','modHabLanz','cdSalv','bonifAtq','raza','clase','subclase','trasfondo','idiomas','descripcion','notasLibres','dadosGolpe','dadoGolpeTipo'];
+    simpleIds.forEach(key => { const el = document.getElementById(key); if(el && sheet[key] !== undefined) el.value = sheet[key]; });
+
+    if(sheet.armorType) document.getElementById('armorType').value = sheet.armorType;
+    if(sheet.armorBase) document.getElementById('armorBase').value = sheet.armorBase;
+    if(sheet.armorBonus) document.getElementById('armorBonus').value = sheet.armorBonus;
+    if(sheet.shieldEquipped) document.getElementById('shieldEquipped').value = sheet.shieldEquipped;
+    
+    if(sheet.unarmoredType) {
+        const radio = document.querySelector(`input[name="unarmoredType"][value="${sheet.unarmoredType}"]`);
+        if(radio) radio.checked = true;
+    }
+
+    if(sheet.txt_accAdic)document.getElementById('accAdic').value=sheet.txt_accAdic;
+    if(sheet.txt_reaccion)document.getElementById('reaccion').value=sheet.txt_reaccion;
+    if(sheet.txt_actionNotes) { 
+        const an = document.getElementById('actionNotes'); 
+        if (an) {
+            an.value = sheet.txt_actionNotes; 
+            autoResize(an);
+        }
+    }
+    if(sheet.invObj1) document.getElementById('invObj1').value = sheet.invObj1; 
+    if(sheet.invObj2) document.getElementById('invObj2').value = sheet.invObj2; 
+    if(sheet.invObj3) document.getElementById('invObj3').value = sheet.invObj3;
+
+    if(sheet.feats) { 
+        const list = document.getElementById('featsList'); 
+        if (list) {
+            list.innerHTML = ''; 
+            sheet.feats.forEach(f => { 
+                const div=document.createElement('div');div.className='section'; 
+                div.innerHTML=`<input placeholder="Nombre dote" style="width:160px;" value="${(f.nombre||'').replace(/"/g, '&quot;')}" onchange="guardarGeneral()"><textarea placeholder="Descripción" rows="3" style="width:100%;" onfocus="this.rows=10" onblur="this.rows=3" onchange="guardarGeneral()">${(f.desc||'').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>`; 
+                list.appendChild(div); 
+            }); 
+        }
+    }
+    if(sheet.traits) { 
+        const list = document.getElementById('traitsList'); 
+        if (list) {
+            list.innerHTML = ''; 
+            sheet.traits.forEach(t => { 
+                const div=document.createElement('div');div.className='section'; 
+                div.innerHTML=`<input placeholder="Nombre rasgo" style="width:160px;" value="${(t.nombre||'').replace(/"/g, '&quot;')}" onchange="guardarGeneral()"><textarea placeholder="Descripción" rows="3" style="width:100%;" onfocus="this.rows=10" onblur="this.rows=3" onchange="guardarGeneral()">${(t.desc||'').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>`; 
+                list.appendChild(div); 
+            }); 
+        }
+    }
+    if(sheet.npcs) { 
+        const list = document.getElementById('npcList'); 
+        if (list) {
+            list.innerHTML = ''; 
+            sheet.npcs.forEach(n => { 
+                const div=document.createElement('div');div.className='section'; 
+                div.innerHTML=`<input placeholder="Nombre NPC" style="width:160px;" value="${(n.nombre||'').replace(/"/g, '&quot;')}" onchange="guardarGeneral()"><textarea placeholder="Nota" rows="2" style="width:100%;" onchange="guardarGeneral()">${(n.nota||'').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>`; 
+                list.appendChild(div); 
+            }); 
+        }
+    }
+    
+    renderBonusList();
+
+    if(sheet.sessionNotes) { 
+        const notesContainer = document.getElementById('sessionNotes'); 
+        if (notesContainer) {
+            notesContainer.innerHTML = ''; 
+            const notesArray = Array.isArray(sheet.sessionNotes) ? sheet.sessionNotes : [sheet.sessionNotes]; 
+            notesArray.forEach(note => { 
+                const p = document.createElement('p'); 
+                p.textContent = note; 
+                notesContainer.appendChild(p); 
+            }); 
+        }
+    }
+
+    if(sheet.stats){
+      Object.keys(sheet.stats).forEach(stat=>{
+        const card=document.querySelector(`.stat-card[data-stat="${stat}"]`);
+        if(card){
+          const puntosInput = card.querySelector('.puntos');
+          if (puntosInput) puntosInput.value=sheet.stats[stat].puntos;
+          sheet.stats[stat].habilidades.forEach((obj,i)=>{
+            const row=card.querySelectorAll('.hab-row')[i];
+            if (row) {
+                if(obj.active) row.querySelector('button').classList.add('active');
+                const extraInput = row.querySelector('.extra');
+                if (extraInput && obj.extra) extraInput.value = obj.extra;
+            }
+          });
+        }
+      });
+    }
+    if(sheet.salvaciones){
+      [...document.querySelectorAll('.salv-btn')].forEach((btn,i)=>{
+        if(btn && sheet.salvaciones[i]){
+          btn.dataset.state=sheet.salvaciones[i].state;
+          btn.style.background=btn.dataset.state==='on' ?(btn.dataset.type==='exito'?'var(--exito)':'var(--fallo)'):'transparent';
+        }
+      });
+    }
+    if(sheet.estados){ 
+        sheet.estados.forEach(est=>{ 
+            const btn=document.querySelector(`.state-btn[data-id="${est.id}"]`); 
+            if(btn){
+                btn.classList.toggle('on',est.on);
+                btn.classList.toggle('off',!est.on);
+            } 
+        }); 
+        actualizarPanelEstados();
+        actualizarAlertaEstado(); 
+    }
+    
+    if (sheet.hechizosSeleccionados && Array.isArray(sheet.hechizosSeleccionados) && sheet.hechizosSeleccionados.length > 0) {
+        if (sheet.hechizos && sheet.hechizos.length > 0) {
+            if (!confirm("¿Quieres fusionar los hechizos del creador con los que ya tienes? (Click en 'Cancelar' para reemplazar)")) {
+                sheet.hechizos = [];
+            }
+        } else {
+            sheet.hechizos = sheet.hechizos || [];
+        }
+
+        const todosLosHechizos = {
+            ...(HECHIZOS.trucos || {}),
+            ...(HECHIZOS.nivel_1 || {}),
+            ...(HECHIZOS.nivel_2 || {}),
+            ...(HECHIZOS.nivel_3 || {}),
+            ...(HECHIZOS.nivel_4 || {}),
+            ...(HECHIZOS.nivel_5 || {}),
+            ...(HECHIZOS.nivel_6 || {}),
+            ...(HECHIZOS.nivel_7 || {}),
+            ...(HECHIZOS.nivel_8 || {}),
+            ...(HECHIZOS.nivel_9 || {})
+        };
+
+        sheet.hechizosSeleccionados.forEach(idHechizo => {
+            const hechizoData = todosLosHechizos[idHechizo];
+            if (hechizoData) {
+                const existe = sheet.hechizos.some(h => h.nombre === hechizoData.nombre);
+                if (!existe) {
+                    sheet.hechizos.push({
+                        id: generateId(),
+                        nombre: hechizoData.nombre,
+                        nivel: hechizoData.nivel,
+                        preparado: true,
+                        concentracion: hechizoData.mecanica?.concentracion || false,
+                        upcastable: !!hechizoData.escalado_superior,
+                        desc: hechizoData.mecanica?.descripcion || ''
+                    });
+                }
+            }
+        });
+    }
+    
+    // MEJORADO: Carga de armas de inventario
+    if (sheet.inventoryWeapons && Array.isArray(sheet.inventoryWeapons)) {
+        inventoryWeapons = sheet.inventoryWeapons;
+    } else {
+        inventoryWeapons = (sheet.armas && Array.isArray(sheet.armas)) ? sheet.armas : [];
+    }
+    armas = inventoryWeapons.filter(w => w.equipped);
+    
+    if (sheet.stats) {
+        setTimeout(() => {
+            Object.keys(sheet.stats).forEach(stat => {
+                const card = document.querySelector(`.stat-card[data-stat="${stat}"]`);
+                if (card && sheet.stats[stat].puntos) {
+                    const puntosInput = card.querySelector('.puntos');
+                    if (puntosInput) puntosInput.value = sheet.stats[stat].puntos;
+                }
+            });
+            actualizarCalculos();
+        }, 100);
+    }
+
+    if(sheet.slots){
+      const botonesSlots = [...document.querySelectorAll('.hueco-btn')];
+      for (let i = 0; i < Math.min(botonesSlots.length, sheet.slots.length); i++) {
+          const btn = botonesSlots[i];
+          const slotData = sheet.slots[i];
+          if(btn && slotData){
+              btn.dataset.gastado = slotData.gastado;
+              if(slotData.nivel) btn.dataset.nivel = slotData.nivel;
+              btn.classList.toggle('gastado', slotData.gastado === 'true');
+              btn.style.background = slotData.gastado === 'true' ? 'var(--usoOn)' : 'var(--gray)';
+          }
+      }
+    } else {
+        initSlots();
+    }
+    
+    if(sheet.habSpecs){habSpecs=sheet.habSpecs;renderHabSpecs();}
+    
+    if(sheet.exhaustionLevel !== undefined) { exhaustionLevel = sheet.exhaustionLevel; renderExhaustion(); }
+    
+    if(sheet.magiaPacto) {
+        magiaPacto = sheet.magiaPacto;
+        const pactoActivo = document.getElementById('pactoActivo');
+        if (pactoActivo) pactoActivo.checked = magiaPacto.activo;
+        const pactoSection = document.getElementById('pactoSection');
+        if (pactoSection) pactoSection.classList.toggle('hidden', !magiaPacto.activo);
+        if(magiaPacto.activo) { 
+            const pactoSlots = document.getElementById('pactoSlots');
+            const pactoNivel = document.getElementById('pactoNivel');
+            if (pactoSlots) pactoSlots.value = magiaPacto.slots || 2; 
+            if (pactoNivel) pactoNivel.value = magiaPacto.nivel || 1; 
+            renderMagiaPacto(); 
+        }
+    }
+    
+    if(sheet.wildshapeActive !== undefined) { wildshapeActive = sheet.wildshapeActive; }
+    if(sheet.filterPreparedActive !== undefined) { 
+        filterPreparedActive = sheet.filterPreparedActive; 
+        const btnFilter = document.getElementById('btnFilterPrepared');
+        if (btnFilter) btnFilter.classList.toggle('active', filterPreparedActive); 
+    }
+    
+    renderSpellsAndCantrips();
+    renderDadosGolpe();
+    
+    if(sheet.ventajaActiva){ventajaActiva=sheet.ventajaActiva;actualizarBotonesVD();}
+    if(sheet.desventajaActiva){desventajaActiva=sheet.desventajaActiva;actualizarBotonesVD();}
+    if(sheet.concentracionActiva){concentracionActiva=sheet.concentracionActiva;actualizarUIConcentracion();}
+    if(sheet.inspiracionActiva){inspiracionActiva=sheet.inspiracionActiva;const btn=document.getElementById('btnInspiracion'); if(btn) btn.classList.toggle('activo',true);}
+    if(sheet.ventajaIni){ventajaIni=sheet.ventajaIni;const btn=document.getElementById('btnVentajaIni'); if(btn) btn.classList.toggle('activo',true);}
+    if(sheet.desventajaIni){desventajaIni=sheet.desventajaIni;const btn=document.getElementById('btnDesventajaIni'); if(btn) btn.classList.toggle('activo',true);}
+    
+    actualizarCalculos();
+    updateActionButtons();
+    renderDynamicResources();
+    renderInventoryWeapons();
+    renderArmas();
+    detectarClase();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  populateDatalists();
+  
+  initSlots(); renderActions(); renderStates(); renderHabSpecs(); renderExhaustion(); actualizarUIConcentracion(); renderDadosGolpe();
+  switchTab('general',{target:document.querySelector('.nav button')}); calcVel('pies');
+  const an = document.getElementById('actionNotes'); if(an) autoResize(an);
+
+  const saved=localStorage.getItem('dndSheet');
+  if(!saved) {
+    sheet = {}; 
+    if(!sheet.action_notes) sheet.action_notes = {}; if(!sheet.hechizos) sheet.hechizos = []; if(!sheet.bonificadores) sheet.bonificadores = [];
+    actualizarCalculos(); renderDadosGolpe();
+    return;
+  }
+  try{ sheet=JSON.parse(saved); applySheetToUI(); }catch(e){ console.warn('Error al cargar ficha guardada',e); }
+});
+</script>
+</body>
+</html>

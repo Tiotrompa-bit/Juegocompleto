@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Character Builder v3.1 - Edición Mejorada</title>
+    <style>
+        /* ====================================================
+           UNIFICACIÓN ESTÉTICA: Tema Oscuro como ficha.html
+           VERSIÓN 3.1 - RESPONSIVE MEJORADO
+        ==================================================== */
+        :root {
+            --bg: #1e1e1e;
+            --card: #2a2a2a;
+            --gray: #555;
+            --white: #fff;
+            --radius: 6px;
+            --trans: 0.25s;
+            --usoOn: #f44336;
+            --accent: #c62828;
+            --exito: #4caf50;
+            --fallo: #f44336;
+            --ambar: #ffc107;
+            --naranja: #ff9800;
+            --rojo: #f44336;
+            --azul: #2196f3;
+            --amarillo: #ffeb3b;
+            --pacto: #3f51b5;
+            --pacto-gastado: #7986cb;
+            --druida: #4caf50;
+            --hechicero: #9c27b0;
+            --monje: #009688;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--white);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 10px;
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--white);
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+        }
+
+        h1 small {
+            font-size: 0.5em;
+            color: #aaa;
+            display: block;
+        }
+
+        h2 {
+            color: var(--white);
+            font-size: 1.3em;
+            margin-top: 0;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        h3 {
+            color: var(--white);
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        /* Grid de dos columnas en escritorio, una en móvil */
+        .builder-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .builder-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .col-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-group {
+                margin-bottom: 15px;
+            }
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #ddd;
+            font-size: 0.95em;
+        }
+
+        label i {
+            color: var(--accent);
+            margin-right: 5px;
+        }
+
+        /* Inputs y selects con fuente 16px para evitar zoom */
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #444;
+            border-radius: var(--radius);
+            font-size: 16px;
+            box-sizing: border-box;
+            background-color: #333;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        input:hover, select:hover, textarea:hover {
+            border-color: var(--accent);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            background-color: #3a3a3a;
+            cursor: default;
+        }
+
+        button {
+            background: var(--gray);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button.secondary {
+            background: #555;
+            margin-top: 5px;
+        }
+
+        button.secondary:hover {
+            background: #666;
+        }
+
+        .panel {
+            background: #222;
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .panel {
+                padding: 12px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .preview-card {
+            border-left: 5px solid var(--accent);
+            padding: 20px;
+            margin-top: 0;
+            background: #222;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        @media (max-width: 600px) {
+            .preview-card {
+                padding: 12px;
+            }
+        }
+
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #444;
+            padding: 8px 0;
+        }
+
+        .stat-line:hover {
+            background-color: #2a2a2a;
+        }
+
+        .value {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .error-message {
+            color: var(--fallo);
+            padding: 12px;
+            background: #442222;
+            border-radius: var(--radius);
+            margin: 10px 0;
+            border-left: 4px solid var(--fallo);
+        }
+
+        .success-message {
+            color: var(--exito);
+            padding: 12px;
+            background: #224422;
+            border-radius: var(--radius);
+            margin: 10px 0;
+            border-left: 4px solid var(--exito);
+        }
+
+        .warning-message {
+            color: var(--ambar);
+            padding: 12px;
+            background: #443322;
+            border-radius: var(--radius);
+            margin: 10px 0;
+            border-left: 4px solid var(--ambar);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 1px dotted #999;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: var(--card);
+            color: #fff;
+            text-align: left;
+            padding: 10px;
+            border-radius: var(--radius);
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            font-weight: normal;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 1px solid var(--accent);
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .stats-preview {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .info-box {
+            background-color: #222;
+            border-radius: var(--radius);
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid var(--accent);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        @media (max-width: 600px) {
+            .info-box {
+                padding: 10px;
+                margin: 10px 0;
+            }
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            color: var(--white);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .badge.race { background-color: #27ae60; color: white; }
+        .badge.class { background-color: #3498db; color: white; }
+        .badge.subclass { background-color: #f39c12; color: white; }
+        .badge.background { background-color: #9b59b6; color: white; }
+
+        .skill-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: var(--radius);
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: #333;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .skill-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .skill-item label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .skill-item.selected {
+            background-color: #442222;
+            border-color: var(--accent);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .tab-container {
+            margin-top: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #444;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            margin: 0;
+            color: #aaa;
+            font-weight: normal;
+            width: auto;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .tab-button {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+        }
+
+        .tab-button:hover {
+            background: #333;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tab-button.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stat-distribution {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 600px) {
+            .stat-distribution {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: #333;
+            border: 1px solid #444;
+            border-radius: var(--radius);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-card .stat-name {
+            font-weight: bold;
+            color: var(--white);
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.5em;
+            margin: 5px 0;
+        }
+
+        .stat-card .stat-mod {
+            color: #aaa;
+        }
+
+        .stat-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .stat-controls button {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            margin: 0;
+            font-size: 1.2em;
+            line-height: 1;
+            background: #555;
+        }
+
+        .stat-controls button:hover {
+            background: var(--accent);
+        }
+
+        .selected-skills {
+            background: #333;
+            border: 1px solid #444;
+            border-radius: var(--radius);
+            padding: 10px;
+            min-height: 50px;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            margin: 3px;
+            font-size: 0.9em;
+        }
+
+        #spellSelector {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #444;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .spell-category {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .spell-category h5 {
+            margin: 0 0 10px 0;
+            color: var(--white);
+        }
+
+        .spell-item {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            margin: 2px 0;
+        }
+
+        .spell-item input {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .spell-item label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+            color: #ddd;
+        }
+
+        /* Estilos para los selectores de equipo */
+        .equipment-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .equipment-col {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .equipment-row.offhand-row {
+            margin-top: 10px;
+            padding: 15px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: var(--radius);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card);
+            padding: 30px;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 600px;
+            border: 2px solid var(--accent);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 600px) {
+            .modal-content {
+                padding: 20px;
+            }
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .json-export-area {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: var(--radius);
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #0f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .copy-instruction {
+            background: #224422;
+            color: var(--exito);
+            padding: 10px;
+            border-radius: var(--radius);
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            margin-top: 0;
+        }
+
+        .btn-copy {
+            background: var(--azul);
+        }
+
+        .btn-copy:hover {
+            background: #1976d2;
+        }
+
+        .btn-close {
+            background: var(--gray);
+        }
+
+        .btn-close:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🏰 D&D 5e Character Builder v3.1
+        <small>Crea tu héroe con estilo</small>
+    </h1>
+
+    <div class="builder-grid">
+        <!-- Columna izquierda: Formulario -->
+        <div class="inputs-column">
+            <div class="form-group">
+                <label for="charName"><i>📝</i> Nombre del Personaje</label>
+                <input type="text" id="charName" placeholder="Ej: Aric Valiente, Lyra Sombrabrisa..." value="Aric">
+            </div>
+
+            <div class="form-group">
+                <label for="selectRace"><i>👤</i> Raza</label>
+                <select id="selectRace">
+                    <option value="">Selecciona una raza...</option>
+                </select>
+                <div id="raceDescription" class="info-box hidden"></div>
+            </div>
+
+            <div class="form-group hidden" id="groupSubrace">
+                <label for="selectSubrace"><i>🔹</i> Subraza / Variante</label>
+                <select id="selectSubrace">
+                    <option value="">Selecciona una opción...</option>
+                </select>
+                <div id="subraceDescription" class="info-box hidden"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="selectClass"><i>⚔️</i> Clase</label>
+                <select id="selectClass">
+                    <option value="">Selecciona una clase...</option>
+                </select>
+                <div id="classDescription" class="info-box hidden"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="levelSelect"><i>📈</i> Nivel</label>
+                <select id="levelSelect">
+                    <option value="1">Nivel 1</option>
+                    <option value="2">Nivel 2</option>
+                    <option value="3">Nivel 3</option>
+                    <option value="4">Nivel 4</option>
+                    <option value="5">Nivel 5</option>
+                    <option value="6">Nivel 6</option>
+                    <option value="7">Nivel 7</option>
+                    <option value="8">Nivel 8</option>
+                    <option value="9">Nivel 9</option>
+                    <option value="10">Nivel 10</option>
+                    <option value="11">Nivel 11</option>
+                    <option value="12">Nivel 12</option>
+                    <option value="13">Nivel 13</option>
+                    <option value="14">Nivel 14</option>
+                    <option value="15">Nivel 15</option>
+                    <option value="16">Nivel 16</option>
+                    <option value="17">Nivel 17</option>
+                    <option value="18">Nivel 18</option>
+                    <option value="19">Nivel 19</option>
+                    <option value="20">Nivel 20</option>
+                </select>
+            </div>
+
+            <!-- Selector de Subclase -->
+            <div class="form-group hidden" id="groupSubclass">
+                <label for="selectSubclass"><i>🔹</i> Subclase</label>
+                <select id="selectSubclass">
+                    <option value="">Selecciona una subclase...</option>
+                </select>
+                <div id="subclassDescription" class="info-box hidden"></div>
+            </div>
+
+            <!-- SELECTORES DE EQUIPO INICIAL MEJORADOS -->
+            <div class="form-group hidden" id="groupEquipment">
+                <label><i>⚔️</i> Equipo Inicial</label>
+                <div class="equipment-row">
+                    <div class="equipment-col">
+                        <label for="selectMainWeapon">Arma Principal</label>
+                        <select id="selectMainWeapon">
+                            <option value="">Selecciona...</option>
+                        </select>
+                    </div>
+                    <div class="equipment-col">
+                        <label for="selectArmor">Armadura</label>
+                        <select id="selectArmor">
+                            <option value="">Ninguna</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Selector de Mano Secundaria (Dinámico) -->
+                <div id="offHandContainer" class="equipment-row offhand-row hidden">
+                    <div class="equipment-col">
+                        <label for="selectOffHand">Mano Secundaria</label>
+                        <select id="selectOffHand">
+                            <option value="">Ninguno</option>
+                        </select>
+                        <p class="warning-message hidden" id="offHandWarning"></p>
+                    </div>
+                </div>
+
+                <p class="warning-message hidden" id="weaponWarning">No tienes competencia con esta arma.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="selectBackground"><i>📜</i> Trasfondo</label>
+                <select id="selectBackground">
+                    <option value="">Selecciona un trasfondo...</option>
+                </select>
+                <div id="backgroundDescription" class="info-box hidden"></div>
+            </div>
+
+            <!-- Segundo selector de trasfondo para Humanos con Dote Extra -->
+            <div class="form-group hidden" id="groupSecondBackground">
+                <label for="selectSecondBackground"><i>📜</i> Segundo Trasfondo (Dote Extra)</label>
+                <select id="selectSecondBackground">
+                    <option value="">Selecciona un segundo trasfondo...</option>
+                </select>
+                <div id="secondBackgroundDescription" class="info-box hidden"></div>
+            </div>
+
+            <!-- Selector de Habilidades (simplificado) -->
+            <div class="form-group hidden" id="groupSkills">
+                <label><i>🎯</i> Habilidades adicionales</label>
+                <div id="skillSelector" class="skill-selector"></div>
+            </div>
+
+            <!-- Selector de Hechizos -->
+            <div class="form-group hidden" id="groupSpells">
+                <label><i>🔮</i> Selecciona tus conjuros</label>
+                <div id="spellInfo" class="info-box"></div>
+                <div id="spellSelector"></div>
+            </div>
+
+            <!-- Distribución de Estadísticas -->
+            <div class="form-group">
+                <label><i>📊</i> Distribución de Estadísticas</label>
+                <div class="stat-distribution" id="statDistribution"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="statProgress" style="width: 0%"></div>
+                </div>
+                <p class="warning-message hidden" id="statWarning">Has superado el límite de 27 puntos</p>
+            </div>
+
+            <div id="errorContainer" class="hidden error-message"></div>
+            <div id="successContainer" class="hidden success-message"></div>
+
+            <button id="btnGenerate" disabled>✨ Generar Personaje</button>
+            <button id="btnReset" class="secondary">🔄 Reiniciar</button>
+            <button id="btnRandomExample" class="secondary">🎲 Ejemplo Aleatorio</button>
+        </div>
+
+        <!-- Columna derecha: Vista Previa -->
+        <div class="preview-column">
+            <div class="preview-card" id="previewArea">
+                <h3 style="margin-top:0">Vista Previa del Personaje</h3>
+                <p style="color:#aaa">Completa el formulario para ver una vista previa detallada de tu personaje.</p>
+            </div>
+
+            <!-- Pestañas para información adicional -->
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="stats">Estadísticas</button>
+                    <button class="tab-button" data-tab="skills">Habilidades</button>
+                    <button class="tab-button" data-tab="features">Rasgos</button>
+                    <button class="tab-button" data-tab="spells">Conjuros</button>
+                </div>
+
+                <div class="tab-content active" id="tab-stats">
+                    <p>Selecciona una raza y clase para ver estadísticas detalladas.</p>
+                </div>
+
+                <div class="tab-content" id="tab-skills">
+                    <p>Las habilidades competentes aparecerán aquí.</p>
+                </div>
+
+                <div class="tab-content" id="tab-features">
+                    <p>Los rasgos de clase y raza aparecerán aquí.</p>
+                </div>
+
+                <div class="tab-content" id="tab-spells">
+                    <p>Si tu clase lanza conjuros, aparecerán aquí.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para exportar JSON -->
+<div id="exportModal" class="modal-overlay hidden">
+    <div class="modal-content">
+        <h3>🎉 Personaje Generado con Éxito</h3>
+        <p>Tu personaje está listo. Sigue estas instrucciones:</p>
+        <div class="copy-instruction">
+            📋 1. Copia el código JSON de abajo<br>
+            2. Abre la ficha del personaje (ficha.html)<br>
+            3. Haz clic en "Importar / Pegar" y pégalo
+        </div>
+        <div id="jsonExportArea" class="json-export-area"></div>
+        <div class="modal-buttons">
+            <button class="btn-copy" onclick="copyJSONToClipboard()">📋 Copiar al Portapapeles</button>
+            <button class="btn-close" onclick="closeExportModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="datos_constantes.js"></script>
+<script src="datos_objetos.js"></script>
+<script src="datos_hechizos.js"></script>
+<script src="datos_razas.js"></script>
+<script src="datos_trasfondos.js"></script>
+<script src="datos_clases.js"></script>
+<script src="datos_subclases.js"></script>
+<script src="motor.js"></script>
+<script src="ui_mejorada.js"></script>
+
+<script>
+// Verificación de carga de datos
+window.addEventListener('load', function() {
+    console.log('=== VERIFICACIÓN DE CARGA ===');
+    console.log('CONSTANTES:', typeof CONSTANTES !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+    console.log('OBJETOS:', typeof OBJETOS !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+    console.log('HECHIZOS:', typeof HECHIZOS !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+    console.log('RAZAS:', typeof RAZAS !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+    console.log('TRASFONDOS:', typeof TRASFONDOS !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+    console.log('CLASES:', typeof CLASES !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+    console.log('SUBCLASES:', typeof SUBCLASES !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+    console.log('MotorPersonaje:', typeof MotorPersonaje !== 'undefined' ? '✅ Cargado' : '❌ No cargado');
+
+    if (typeof CLASES !== 'undefined' && CLASES.mago) {
+        console.log('✅ Clase Mago disponible');
+    }
+});
+
+// Funciones globales para el modal de exportación
+function showExportModal(jsonString) {
+    const modal = document.getElementById('exportModal');
+    const area = document.getElementById('jsonExportArea');
+    area.textContent = jsonString;
+    modal.classList.remove('hidden');
+}
+
+function closeExportModal() {
+    document.getElementById('exportModal').classList.add('hidden');
+}
+
+function copyJSONToClipboard() {
+    const jsonText = document.getElementById('jsonExportArea').textContent;
+    navigator.clipboard.writeText(jsonText).then(() => {
+        alert('✅ JSON copiado al portapapeles');
+    }).catch(err => {
+        alert('❌ Error al copiar: ' + err);
+    });
+}
+</script>
+</body>
+</html>
